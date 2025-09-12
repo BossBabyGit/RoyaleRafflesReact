@@ -10,7 +10,7 @@ export default function ActivityFeed() {
 
   useEffect(() => {
     const relevant = activity
-      .filter((a) => ['purchase', 'raffle_end'].includes(a.type))
+      .filter((a) => ['purchase', 'raffle_end', 'topup'].includes(a.type))
       .filter((a) => !processed.current.has(a.id));
 
     relevant.forEach((ev) => {
@@ -47,6 +47,9 @@ export default function ActivityFeed() {
     if (e.type === 'purchase') {
       return `${e.user} bought ${e.count} ticket${e.count > 1 ? 's' : ''} for ${getTitle(e.raffleId)}`;
     }
+    if (e.type === 'topup') {
+      return `${e.user} added $${e.amount.toFixed(2)} to their balance`;
+    }
     if (e.type === 'raffle_end') {
       return `${e.winner} won the ${getTitle(e.raffleId)} raffle 🎉`;
     }
@@ -66,13 +69,13 @@ export default function ActivityFeed() {
             >
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-darker ${
-                  e.type === 'purchase' ? 'bg-blue-light' : 'bg-claret-light'
+                  e.type === 'raffle_end' ? 'bg-claret-light' : 'bg-blue-light'
                 }`}
               >
                 {(e.type === 'raffle_end' ? e.winner : e.user)?.[0]?.toUpperCase()}
               </div>
               <span className="truncate max-w-[200px] sm:max-w-xs">
-                {e.type === 'purchase' ? '🎟️' : '🏆'} {renderText(e)}
+                {e.type === 'purchase' ? '🎟️' : e.type === 'topup' ? '💰' : '🏆'} {renderText(e)}
               </span>
             </li>
           ))}
