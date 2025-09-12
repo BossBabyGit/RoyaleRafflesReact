@@ -22,7 +22,7 @@ export default function Admin() {
       </div>
       {tab==='raffles' && <RafflesAdmin raffles={raffles} onSave={(r)=>{upsertRaffle(r); notify('Raffle saved')}} onEnd={(id)=>{endRaffleManually(id); notify('Raffle ended')}} />}
       {tab==='users' && <UsersAdmin users={getAllUsers()} />}
-      {tab==='analytics' && <AnalyticsAdmin raffles={raffles} />}
+      {tab==='analytics' && <AnalyticsAdmin raffles={raffles} users={getAllUsers()} />}
     </div>
   )
 }
@@ -112,42 +112,195 @@ function UsersAdmin({ users }) {
   )
 }
 
-function AnalyticsAdmin({ raffles }) {
-  const totalTickets = useMemo(()=>raffles.reduce((s,r)=>s+r.sold,0),[raffles])
-  const revenue = useMemo(()=>raffles.reduce((s,r)=>s + r.sold * r.ticketPrice, 0),[raffles])
-  const byCat = useMemo(()=>{
+function AnalyticsAdmin({ raffles, users = [] }) {
+  // --- Aggregates ---
+  const totalTickets = useMemo(
+    () => raffles.reduce((s, r) => s + (r.sold || 0), 0),
+    [raffles]
+  )
+
+  const revenue = useMemo(
+    () => raffles.reduce((s, r) => s + (r.sold || 0) * (r.ticketPrice || 0), 0),
+    [raffles]
+  )
+
+  const prizeCostTotal = useMemo(
+    () => raffles.reduce((s, r) => s + (r.value || 0), 0),
+    [raffles]
+  )
+  const prizeCostEnded = useMemo(
+    () => raffles.filter(r => r.ended).reduce((s, r) => s + (r.value || 0), 0),
+    [raffles]
+  )
+
+  const profitTotal = revenue - prizeCostTotal
+  const profitEnded = revenue - prizeCostEnded
+
+  const activeRaffles = raffles.filter(r => !r.ended).length
+  const endedRaffles  = raffles.filter(r => r.ended).length
+
+  // Popular categories (kept from your version)
+  const byCat = useMemo(() => {
     const m = {}
-    raffles.forEach(r => { m[r.category] = (m[r.category]||0) + r.sold })
+    raffles.forEach(r => {
+      m[r.category || 'General'] = (m[r.category || 'General'] || 0) + (r.sold || 0)
+    })
     return Object.entries(m).sort((a,b)=>b[1]-a[1])
-  },[raffles])
-  const top = useMemo(()=>{
-    return [...raffles].sort((a,b)=>b.sold - a.sold)[0]
-  },[raffles])
+  }, [raffles])
+
+  // --- User-level metrics ---
+  const joinedUsers = useMemo(() => {
+    return users.filter(u => {
+      const entries = u?.entries || {}
+      return Object.values(entries).some(v => (v || 0) > 0)
+    })
+  }, [users])
+
+  // Demo heuristic for "topped up":
+  // default registered balance is 100; if balance !== 100 OR they have entries, count as 'topped up'
+  const toppedUpUsers = useMemo(() => {
+    return users.filter(u => {
+      const hasEntries = Object.values(u?.entries || {}).some(v => (v || 0) > 0)
+      return (u.balance ?? 0) !== 100 || hasEntries
+    })
+  }, [users])
+
+  const totalUsers = users.length
+  const buyersCount = joinedUsers.length
+
+  const totalTicketsByUsers = useMemo(() => {
+    // Sum per-user entries across all raffles
+    return users.reduce((sum, u) => {
+      const entries = u?.entries || {}
+      const mine = Object.values(entries).reduce((s, v) => s + (v || 0), 0)
+      return sum + mine
+    }, 0)
+  }, [users])
+
+  const avgTicketsPerUserOverall = totalUsers > 0 ? (totalTicketsByUsers / totalUsers) : 0
+  const avgTicketsPerBuyer       = buyersCount > 0 ? (totalTicketsByUsers / buyersCount) : 0
+
+  // --- Simple bar components (no external libs) ---
+  const BarPair = ({ aLabel, aValue, bLabel, bValue, format = v => v }) => {
+    const max = Math.max(aValue, bValue, 1)
+    const aW = Math.round((aValue / max) * 100)
+    const bW = Math.round((bValue / max) * 100)
+    return (
+      <div className="space-y-3">
+        <div>
+          <div className="flex justify-between text-sm text-white/80">
+            <span>{aLabel}</span><span>{format(aValue)}</span>
+          </div>
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden mt-1">
+            <div className="h-2 bg-blue-light" style={{ width: `${aW}%` }} />
+          </div>
+        </div>
+        <div>
+          <div className="flex justify-between text-sm text-white/80">
+            <span>{bLabel}</span><span>{format(bValue)}</span>
+          </div>
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden mt-1">
+            <div className="h-2 bg-claret" style={{ width: `${bW}%` }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const Funnel = ({ stages }) => {
+    const max = Math.max(...stages.map(s => s.value), 1)
+    return (
+      <div className="space-y-3">
+        {stages.map((s, idx) => {
+          const w = Math.round((s.value / max) * 100)
+          return (
+            <div key={idx}>
+              <div className="flex justify-between text-sm text-white/80">
+                <span>{s.label}</span><span>{s.value}</span>
+              </div>
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden mt-1">
+                <div className="h-2 bg-white/60" style={{ width: `${w}%` }} />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  const currency = (n) => `$${(n || 0).toFixed(2)}`
 
   return (
-    <div className="glass rounded-2xl p-6 space-y-4">
+    <div className="glass rounded-2xl p-6 space-y-6">
       <h3 className="text-xl font-semibold">Analytics</h3>
-      <div className="grid md:grid-cols-3 gap-4">
+
+      {/* KPI Cards */}
+      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
         <StatCard title="Tickets Sold" value={totalTickets} />
-        <StatCard title="Revenue (demo)" value={"$"+revenue.toFixed(2)} />
-        <StatCard title="Top Raffle" value={top?top.title:'—'} />
+        <StatCard title="Revenue (demo)" value={currency(revenue)} />
+        <StatCard title="Prize Cost (all)" value={currency(prizeCostTotal)} />
+        <StatCard title="Profit (all)" value={currency(profitTotal)} />
+
+        <StatCard title="Avg Tickets / User" value={avgTicketsPerUserOverall.toFixed(2)} />
+        <StatCard title="Avg Tickets / Buyer" value={avgTicketsPerBuyer.toFixed(2)} />
+        <StatCard title="Active Raffles" value={activeRaffles} />
+        <StatCard title="Ended Raffles" value={endedRaffles} />
       </div>
+
+      {/* Revenue vs Cost */}
+      <div className="p-4 rounded-2xl bg-black/20 border border-white/10">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="font-semibold">Revenue vs. Prize Cost</h4>
+          <div className="text-sm text-white/60">All raffles</div>
+        </div>
+        <BarPair
+          aLabel="Revenue"
+          aValue={revenue}
+          bLabel="Prize Cost"
+          bValue={prizeCostTotal}
+          format={currency}
+        />
+        <div className="mt-4 text-xs text-white/60">
+          Also tracking ended raffles only: <b>Profit (ended)</b> = {currency(profitEnded)} • <b>Prize Cost (ended)</b> = {currency(prizeCostEnded)}
+        </div>
+      </div>
+
+      {/* Conversion Funnel */}
+      <div className="p-4 rounded-2xl bg-black/20 border border-white/10">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="font-semibold">Conversion Funnel</h4>
+          <div className="text-sm text-white/60">Registered → Topped Up → Joined</div>
+        </div>
+        <Funnel stages={[
+          { label: 'Registered', value: totalUsers },
+          { label: 'Topped Up (demo)', value: toppedUpUsers.length },
+          { label: 'Joined a Raffle', value: buyersCount },
+        ]}/>
+        <div className="mt-3 text-xs text-white/60">
+          Demo heuristic: users with balance ≠ 100 or with entries are considered "topped up".
+        </div>
+      </div>
+
+      {/* Popular Categories (kept) */}
       <div>
-        <h4 className="mt-4 font-semibold">Popular Categories</h4>
+        <h4 className="mt-2 font-semibold">Popular Categories</h4>
         <div className="mt-2 space-y-2">
-          {byCat.map(([cat, n])=>(
+          {byCat.map(([cat, n]) => (
             <div key={cat} className="flex items-center gap-3">
               <div className="w-40">{cat}</div>
-              <div className="flex-1 bg-white/10 h-2 rounded-full overflow-hidden"><div className="h-2 bg-blue-light" style={{width: (n/Math.max(1,totalTickets))*100 + '%'}}></div></div>
+              <div className="flex-1 bg-white/10 h-2 rounded-full overflow-hidden">
+                <div className="h-2 bg-blue-light" style={{ width: (n / Math.max(1, totalTickets)) * 100 + '%' }} />
+              </div>
               <div className="w-16 text-right">{n}</div>
             </div>
           ))}
-          {byCat.length===0 && <div className="text-white/60">No data yet.</div>}
+          {byCat.length === 0 && <div className="text-white/60">No data yet.</div>}
         </div>
       </div>
     </div>
   )
 }
+
 
 function StatCard({ title, value }) {
   return (
