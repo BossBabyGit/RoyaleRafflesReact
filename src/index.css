@@ -1,0 +1,31 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --claret: #7f1734;
+  --claret-light: #9a1f3d;
+  --blue: #0055a5;
+  --blue-light: #0077cc;
+  --accent: #7f1734;
+  --dark-bg: #0f0f1a;
+  --darker-bg: #080811;
+}
+
+body {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(127,23,52,0.25), transparent 60%),
+              radial-gradient(800px 400px at 90% 10%, rgba(0,119,204,0.25), transparent 60%),
+              radial-gradient(900px 500px at 50% 120%, rgba(0,85,165,0.22), transparent 60%),
+              linear-gradient(120deg, #0f0f1a, #080811, #0f0f1a);
+  background-size: 300% 300%;
+  animation: gradientMove 22s ease infinite;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.20);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
