@@ -2,15 +2,14 @@
 import { useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useRaffles } from '../context/RaffleContext'
-  import { useNotify } from '../context/NotificationContext'
-  import ActivityFeed from '../components/ActivityFeed'
+import { useNotify } from '../context/NotificationContext'
 
 export default function Dashboard() {
   const { getProfile, updateProfile } = useAuth()
   const { raffles } = useRaffles()
   const [amt, setAmt] = useState(10)
   const { notify, log } = useNotify()
-    const profile = getProfile()
+  const profile = getProfile()
 
   const myActive = useMemo(()=>{
     const ids = Object.keys(profile.entries || {}).map(n=>parseInt(n,10))
