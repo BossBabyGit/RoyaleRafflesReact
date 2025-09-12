@@ -2,6 +2,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import ActivityFeed from './components/ActivityFeed'
 import Home from './pages/Home'
 import Raffles from './pages/Raffles'
 import RaffleDetails from './pages/RaffleDetails'
@@ -33,6 +34,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <ActivityFeed />
     </div>
   )
 }

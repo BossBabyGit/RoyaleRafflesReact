@@ -1,44 +1,83 @@
-
-import { useNotify } from '../context/NotificationContext'
-import { useRaffles } from '../context/RaffleContext'
-
-function timeAgo(t) {
-  const d = Date.now() - t
-  const s = Math.floor(d/1000)
-  if (s<60) return s + 's ago'
-  const m = Math.floor(s/60)
-  if (m<60) return m + 'm ago'
-  const h = Math.floor(m/60)
-  if (h<24) return h + 'h ago'
-  const dd = Math.floor(h/24)
-  return dd + 'd ago'
-}
+import { useEffect, useRef, useState } from 'react';
+import { useNotify } from '../context/NotificationContext';
+import { useRaffles } from '../context/RaffleContext';
 
 export default function ActivityFeed() {
-  const { activity, clearActivity } = useNotify()
-  const { raffles } = useRaffles()
+  const { activity } = useNotify();
+  const { raffles } = useRaffles();
+  const [items, setItems] = useState([]);
+  const processed = useRef(new Set());
 
-  const getR = id => raffles.find(r => r.id === id)
+  useEffect(() => {
+    const relevant = activity
+      .filter((a) => ['purchase', 'raffle_end'].includes(a.type))
+      .filter((a) => !processed.current.has(a.id));
+
+    relevant.forEach((ev) => {
+      processed.current.add(ev.id);
+      const entry = { ...ev, show: false };
+      setItems((prev) => {
+        const next = [...prev, entry];
+        if (next.length > 10) {
+          const removed = next.shift();
+          processed.current.delete(removed.id);
+        }
+        return next;
+      });
+      // trigger enter animation
+      setTimeout(() => {
+        setItems((prev) => prev.map((it) => (it.id === ev.id ? { ...it, show: true } : it)));
+      }, 50);
+      // schedule removal
+      setTimeout(() => {
+        setItems((prev) => prev.map((it) => (it.id === ev.id ? { ...it, show: false } : it)));
+        setTimeout(() => {
+          setItems((prev) => prev.filter((it) => it.id !== ev.id));
+          processed.current.delete(ev.id);
+        }, 500);
+      }, 30000);
+    });
+  }, [activity]);
+
+  if (items.length === 0) return null;
+
+  const getTitle = (id) => raffles.find((r) => r.id === id)?.title || `Raffle #${id}`;
+
+  const renderText = (e) => {
+    if (e.type === 'purchase') {
+      return `${e.user} bought ${e.count} ticket${e.count > 1 ? 's' : ''} for ${getTitle(e.raffleId)}`;
+    }
+    if (e.type === 'raffle_end') {
+      return `${e.winner} won the ${getTitle(e.raffleId)} raffle 🎉`;
+    }
+    return '';
+  };
 
   return (
-    <div className="glass rounded-2xl p-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold">Activity</h3>
-        <button className="text-sm px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={clearActivity}>Clear</button>
-      </div>
-      <div className="mt-4 space-y-3 max-h-80 overflow-auto">
-        {activity.length ? activity.map(a => (
-          <div key={a.id} className="p-3 rounded-xl bg-black/20 border border-white/10 text-sm flex items-center justify-between">
-            <div>
-              {a.type==='purchase' && <span><b>{a.user}</b> bought <b>{a.count}</b> ticket(s) for <b>{getR(a.raffleId)?.title||'#'+a.raffleId}</b></span>}
-              {a.type==='topup' && <span><b>{a.user}</b> topped up <b>${a.amount?.toFixed?.(2)||a.amount}</b></span>}
-              {a.type==='raffle_end' && <span>Raffle <b>{getR(a.raffleId)?.title||'#'+a.raffleId}</b> ended. Winner: <b>{a.winner}</b></span>}
-              {a.type==='raffle_end_manual' && <span>Admin ended <b>{getR(a.raffleId)?.title||'#'+a.raffleId}</b>. Winner: <b>{a.winner||'None'}</b></span>}
-            </div>
-            <div className="text-white/50">{timeAgo(a.time)}</div>
-          </div>
-        )) : <div className="text-white/60">No recent activity.</div>}
+    <div className="fixed bottom-4 left-0 w-full flex justify-center z-50 px-4 pointer-events-none">
+      <div className="pointer-events-auto bg-black/40 backdrop-blur-md rounded-xl shadow-glow overflow-hidden">
+        <ul className="flex gap-4 py-2 px-4">
+          {items.map((e) => (
+            <li
+              key={e.id}
+              className={`flex items-center gap-2 text-xs sm:text-sm min-w-max transition-all duration-500 ${
+                e.show ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+              }`}
+            >
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-darker ${
+                  e.type === 'purchase' ? 'bg-blue-light' : 'bg-claret-light'
+                }`}
+              >
+                {(e.type === 'raffle_end' ? e.winner : e.user)?.[0]?.toUpperCase()}
+              </div>
+              <span className="truncate max-w-[200px] sm:max-w-xs">
+                {e.type === 'purchase' ? '🎟️' : '🏆'} {renderText(e)}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
-  )
+  );
 }
