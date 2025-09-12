@@ -1,63 +1,77 @@
-import { useEffect, useRef, useState } from 'react';
-import { useNotify } from '../context/NotificationContext';
-import { useRaffles } from '../context/RaffleContext';
+import { useEffect, useRef, useState } from 'react'
+
+// Generate random demo events for the activity feed
+function createDummyEvent() {
+  const id = Date.now() + Math.random()
+  const users = ['Alice', 'Bob', 'Charlie', 'Dana']
+  const raffles = [1, 2, 3]
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
+  const type = pick(['purchase', 'topup', 'raffle_end'])
+  if (type === 'purchase') {
+    return { id, type, user: pick(users), count: Math.ceil(Math.random() * 5), raffleId: pick(raffles) }
+  }
+  if (type === 'topup') {
+    return { id, type, user: pick(users), amount: Math.random() * 100 }
+  }
+  return { id, type, winner: pick(users), raffleId: pick(raffles) }
+}
 
 export default function ActivityFeed() {
-  const { activity } = useNotify();
-  const { raffles } = useRaffles();
-  const [items, setItems] = useState([]);
-  const processed = useRef(new Set());
+  const [items, setItems] = useState([])
+  const processed = useRef(new Set())
 
   useEffect(() => {
-    const relevant = activity
-      .filter((a) => ['purchase', 'raffle_end', 'topup'].includes(a.type))
-      .filter((a) => !processed.current.has(a.id));
-
-    relevant.forEach((ev) => {
-      processed.current.add(ev.id);
-      const entry = { ...ev, show: false };
-      setItems((prev) => {
-        const next = [...prev, entry];
-        if (next.length > 10) {
-          const removed = next.shift();
-          processed.current.delete(removed.id);
-        }
-        return next;
-      });
-      // trigger enter animation
-      setTimeout(() => {
-        setItems((prev) => prev.map((it) => (it.id === ev.id ? { ...it, show: true } : it)));
-      }, 50);
-      // schedule removal
-      setTimeout(() => {
-        setItems((prev) => prev.map((it) => (it.id === ev.id ? { ...it, show: false } : it)));
+    let timeout
+    const schedule = () => {
+      const delay = 5000 + Math.random() * 5000 // 5-10 seconds
+      timeout = setTimeout(() => {
+        const ev = createDummyEvent()
+        processed.current.add(ev.id)
+        const entry = { ...ev, show: false }
+        setItems((prev) => {
+          const next = [...prev, entry]
+          if (next.length > 10) {
+            const removed = next.shift()
+            processed.current.delete(removed.id)
+          }
+          return next
+        })
+        // trigger enter animation
         setTimeout(() => {
-          setItems((prev) => prev.filter((it) => it.id !== ev.id));
-          processed.current.delete(ev.id);
-        }, 500);
-      }, 30000);
-    });
-  }, [activity]);
+          setItems((prev) => prev.map((it) => (it.id === ev.id ? { ...it, show: true } : it)))
+        }, 50)
+        // schedule removal
+        setTimeout(() => {
+          setItems((prev) => prev.map((it) => (it.id === ev.id ? { ...it, show: false } : it)))
+          setTimeout(() => {
+            setItems((prev) => prev.filter((it) => it.id !== ev.id))
+            processed.current.delete(ev.id)
+          }, 500)
+        }, 30000)
+        schedule()
+      }, delay)
+    }
+    schedule()
+    return () => clearTimeout(timeout)
+  }, [])
 
-  if (items.length === 0) return null;
-
-  const getTitle = (id) => raffles.find((r) => r.id === id)?.title || `Raffle #${id}`;
+  if (items.length === 0) return null
 
   const renderText = (e) => {
     if (e.type === 'purchase') {
-      return `${e.user} bought ${e.count} ticket${e.count > 1 ? 's' : ''} for ${getTitle(e.raffleId)}`;
+      return `${e.user} bought ${e.count} ticket${e.count > 1 ? 's' : ''} for Raffle #${e.raffleId}`
     }
     if (e.type === 'topup') {
-      return `${e.user} added $${e.amount.toFixed(2)} to their balance`;
+      return `${e.user} added $${e.amount.toFixed(2)} to their balance`
     }
     if (e.type === 'raffle_end') {
-      return `${e.winner} won the ${getTitle(e.raffleId)} raffle 🎉`;
+      return `${e.winner} won the Raffle #${e.raffleId} raffle 🎉`
     }
-    return '';
-  };
+    return ''
+  }
 
   return (
-    <div className="fixed bottom-4 left-0 w-full flex justify-center z-50 px-4 pointer-events-none">
+    <div className="fixed top-20 left-0 w-full flex justify-center z-40 px-4 pointer-events-none">
       <div className="pointer-events-auto bg-black/40 backdrop-blur-md rounded-xl shadow-glow overflow-hidden">
         <ul className="flex gap-4 py-2 px-4">
           {items.map((e) => (
@@ -82,5 +96,5 @@ export default function ActivityFeed() {
         </ul>
       </div>
     </div>
-  );
+  )
 }

@@ -21,6 +21,7 @@ export default function App() {
   return (
     <div className="text-white min-h-screen flex flex-col">
       <Header />
+      <ActivityFeed />
       <main className="flex-1 px-4 md:px-8 max-w-7xl mx-auto w-full">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -34,7 +35,6 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
-      <ActivityFeed />
     </div>
   )
 }
