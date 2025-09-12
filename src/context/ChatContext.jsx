@@ -35,7 +35,7 @@ export function ChatProvider({ children }) {
           rooms: [],
           messagesByRoom: {},
           activeRoomId: 'lobby',
-          collapsed: true,
+          collapsed: false,
           unreadCounts: {},
         }
   })
@@ -50,7 +50,7 @@ export function ChatProvider({ children }) {
         rooms: DEFAULT_ROOMS,
         messagesByRoom: messages,
         activeRoomId: 'lobby',
-        collapsed: true,
+        collapsed: false,
         unreadCounts: unread,
       }
     })
@@ -92,18 +92,6 @@ export function ChatProvider({ children }) {
       return { ...s, messagesByRoom: messages, unreadCounts: unread }
     })
 
-  const createRoom = (name) =>
-    setState((s) => {
-      const id = name.toLowerCase().replace(/\s+/g, '-')
-      if (s.rooms.find((r) => r.id === id)) return s
-      return {
-        ...s,
-        rooms: [...s.rooms, { id, name }],
-        messagesByRoom: { ...s.messagesByRoom, [id]: [] },
-        unreadCounts: { ...s.unreadCounts, [id]: 0 },
-      }
-    })
-
   return (
     <ChatCtx.Provider
       value={{
@@ -111,7 +99,6 @@ export function ChatProvider({ children }) {
         setCollapsed,
         setActiveRoom,
         sendMessage,
-        createRoom,
         seedIfEmpty,
       }}
     >
