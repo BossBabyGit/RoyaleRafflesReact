@@ -23,11 +23,16 @@ export default {
           "0%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" },
           "100%": { transform: "translateY(0px)" }
+        },
+        fadeInUp: {
+          "0%": { opacity: 0, transform: "translateY(8px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" }
         }
       },
       animation: {
         gradient: "gradientMove 18s ease infinite",
-        floaty: "floaty 6s ease-in-out infinite"
+        floaty: "floaty 6s ease-in-out infinite",
+        "fade-in-up": "fadeInUp 0.4s ease forwards"
       },
       boxShadow: {
         glow: "0 0 30px rgba(127, 23, 52, 0.45)",
