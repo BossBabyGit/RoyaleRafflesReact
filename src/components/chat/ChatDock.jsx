@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import Message from './Message'
 
 export default function ChatDock() {
-  const { rooms, messagesByRoom, activeRoomId, collapsed, unreadCounts, setCollapsed, setActiveRoom, sendMessage, createRoom } = useChat()
+  const { rooms, messagesByRoom, activeRoomId, collapsed, unreadCounts, setCollapsed, setActiveRoom, sendMessage } = useChat()
   const { user } = useAuth()
 
   const [guest, setGuest] = useState('')
@@ -50,11 +50,6 @@ export default function ChatDock() {
     typingTimeout.current = setTimeout(() => setTyping(false), 2000)
   }
 
-  const handleAddRoom = () => {
-    const name = prompt('New room name?')
-    if (name) createRoom(name)
-  }
-
   if (collapsed) {
     return (
       <button
@@ -68,7 +63,7 @@ export default function ChatDock() {
   }
 
   return (
-    <div className="fixed z-50 bottom-2 right-2 left-2 sm:left-auto sm:right-4 sm:bottom-4 w-auto sm:w-[360px] max-h-[70vh] bg-black/30 border border-white/10 rounded-2xl p-3 shadow-glow flex flex-col">
+    <div className="fixed z-50 inset-y-0 right-0 w-full sm:w-[360px] bg-black/30 border-l border-white/10 p-3 shadow-glow flex flex-col">
       <div className="flex items-center gap-1 mb-2">
         {rooms.map((r) => (
           <button
@@ -82,7 +77,6 @@ export default function ChatDock() {
             )}
           </button>
         ))}
-        <button onClick={handleAddRoom} className="px-2 py-1 rounded-xl bg-white/10">+</button>
         <button onClick={() => setCollapsed(true)} className="ml-auto px-2 py-1 rounded-xl bg-white/10">×</button>
       </div>
       <div className="flex-1 overflow-y-auto mb-2 space-y-1" role="log" aria-live="polite">
