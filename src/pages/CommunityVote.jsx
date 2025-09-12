@@ -106,10 +106,37 @@ export default function CommunityVote() {
     title: 'What prize should we raffle next?',
     endsAt: Date.now() + 3 * 24 * 60 * 60 * 1000,
     options: [
+
+      {
+        id: 'ps5',
+        label: 'PS5',
+        image:
+          'https://images.unsplash.com/photo-1606811844079-ae37ae9304ab?q=80&w=800&auto=format&fit=crop',
+      },
+      {
+        id: 'iphone',
+        label: 'iPhone 15',
+        image:
+          'https://images.unsplash.com/photo-1598032891856-7b7a0a8b07c5?q=80&w=800&auto=format&fit=crop',
+      },
+      {
+        id: 'cash',
+        label: 'Cash Prize',
+        image:
+          'https://images.unsplash.com/photo-1565372918673-0493e727abd2?q=80&w=800&auto=format&fit=crop',
+      },
+      {
+        id: 'switch',
+        label: 'Nintendo Switch',
+        image:
+          'https://images.unsplash.com/photo-1582201942325-4be2bdfdb6ea?q=80&w=800&auto=format&fit=crop',
+      },
+
       { id: 'ps5', label: 'PS5', image: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/PlayStation_5.png' },
       { id: 'iphone', label: 'iPhone 15', image: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/IPhone_15_Pink.svg' },
       { id: 'cash', label: 'Cash Prize', image: 'https://upload.wikimedia.org/wikipedia/commons/1/12/US_one_hundred_dollar_bill%2C_obverse%2C_series_2009.jpg' },
       { id: 'switch', label: 'Nintendo Switch', image: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Nintendo_Switch_%28White%29.png' }
+
     ]
   }
 
@@ -121,8 +148,19 @@ export default function CommunityVote() {
 
   useEffect(() => {
     const raw = localStorage.getItem(storageKey)
+
+    if (raw) {
+      setVotes(JSON.parse(raw))
+    } else {
+      const demo = { demo1: 'ps5', demo2: 'cash', demo3: 'iphone' }
+      localStorage.setItem(storageKey, JSON.stringify(demo))
+      setVotes(demo)
+    }
+  }, [storageKey])
+
     setVotes(raw ? JSON.parse(raw) : {})
   }, [])
+
 
   useEffect(() => {
     if (user) setVoterId(user.username)
@@ -186,7 +224,10 @@ export default function CommunityVote() {
   return (
     <div className="py-8">
       {/* HERO */}
+      <section className="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-4">
+
       <section className="min-h-[70vh] flex flex-col items-center justify-center text-center space-y-4">
+
         <h1 className="text-4xl md:text-5xl font-extrabold">Community Vote</h1>
         <p className="text-white/70 max-w-xl">{poll.title}</p>
         {!closed ? (
