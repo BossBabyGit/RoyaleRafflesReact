@@ -13,6 +13,7 @@ import HallOfFame from './pages/HallOfFame'
 import CommunityVote from './pages/CommunityVote'
 import { useAuth } from './context/AuthContext'
 import ChatDock from './components/chat/ChatDock'
+import { useChat } from './context/ChatContext'
 
 function PrivateRoute({ children }) {
   const { user } = useAuth()
@@ -20,8 +21,9 @@ function PrivateRoute({ children }) {
 }
 
 export default function App() {
+  const { collapsed } = useChat()
   return (
-    <div className="text-white min-h-screen flex flex-col">
+    <div className={`text-white min-h-screen flex flex-col transition-[padding] duration-300 ${collapsed ? '' : 'sm:pr-[360px]'}`}>
       <Header />
       <ActivityFeed />
       <main className="flex-1 px-4 md:px-8 max-w-7xl mx-auto w-full">

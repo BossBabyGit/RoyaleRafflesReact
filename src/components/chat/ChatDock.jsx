@@ -54,7 +54,7 @@ export default function ChatDock() {
     return (
       <button
         onClick={() => setCollapsed(false)}
-        className="fixed bottom-4 right-4 sm:right-4 sm:bottom-4 bg-black/30 border border-white/10 rounded-full px-4 py-2 shadow-glow flex items-center gap-2"
+        className="fixed bottom-4 right-4 sm:right-4 sm:bottom-4 bg-darker border border-white/10 rounded-full px-4 py-2 shadow-glow flex items-center gap-2"
       >
         <span>Chat \uD83D\uDCAC</span>
         {totalUnread > 0 && <span className="bg-red-500 text-white rounded-full px-2 text-xs">{totalUnread}</span>}
@@ -63,7 +63,7 @@ export default function ChatDock() {
   }
 
   return (
-    <div className="fixed z-50 inset-y-0 right-0 w-full sm:w-[360px] bg-black/30 border-l border-white/10 p-3 shadow-glow flex flex-col">
+    <div className="fixed z-50 inset-y-0 right-0 w-full sm:w-[360px] bg-darker border-l border-white/10 p-3 shadow-glow flex flex-col">
       <div className="flex items-center gap-1 mb-2">
         {rooms.map((r) => (
           <button
@@ -100,7 +100,7 @@ export default function ChatDock() {
           onKeyDown={handleKey}
           onFocus={handleFocus}
           rows={1}
-          className="flex-1 resize-none rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-light"
+          className="flex-1 resize-none rounded-xl bg-darker border border-white/10 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-light"
         />
         <button
           onClick={handleSend}
