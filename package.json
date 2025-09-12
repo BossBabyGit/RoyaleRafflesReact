@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "npx --yes vite@5.4.2 build",
+    "preview": "vite preview",
+    "postinstall": "chmod +x node_modules/.bin/vite || true"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -23,7 +24,5 @@
     "@types/react": "^18.2.58",
     "@types/react-dom": "^18.2.19"
   },
-  "engines": {
-    "node": ">=18"
-  }
+  "engines": { "node": ">=18" }
 }
