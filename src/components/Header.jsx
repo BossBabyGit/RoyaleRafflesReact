@@ -16,6 +16,7 @@ export default function Header() {
         <nav className="flex items-center gap-6 text-sm">
           <NavLink to="/" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>Home</NavLink>
           <NavLink to="/raffles" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>Raffles</NavLink>
+          <NavLink to="/community-vote" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>Community Vote</NavLink>
           <NavLink to="/hall-of-fame" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>Hall of Fame</NavLink>
           {user && <NavLink to="/dashboard" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>My Account</NavLink>}
             {user?.isAdmin && <NavLink to="/admin" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>Admin</NavLink>}
