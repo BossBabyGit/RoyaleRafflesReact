@@ -4,10 +4,11 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Raffles from './pages/Raffles'
-  import RaffleDetails from './pages/RaffleDetails'
+import RaffleDetails from './pages/RaffleDetails'
 import Dashboard from './pages/Dashboard'
 import Auth from './pages/Auth'
-  import Admin from './pages/Admin'
+import Admin from './pages/Admin'
+import HallOfFame from './pages/HallOfFame'
 import { useAuth } from './context/AuthContext'
 
 function PrivateRoute({ children }) {
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/raffles" element={<Raffles />} />
             <Route path="/raffles/:id" element={<RaffleDetails />} />
+          <Route path="/hall-of-fame" element={<HallOfFame />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<Admin />} />
