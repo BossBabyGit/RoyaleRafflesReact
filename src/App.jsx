@@ -12,6 +12,7 @@ import Admin from './pages/Admin'
 import HallOfFame from './pages/HallOfFame'
 import CommunityVote from './pages/CommunityVote'
 import { useAuth } from './context/AuthContext'
+import ChatDock from './components/chat/ChatDock'
 
 function PrivateRoute({ children }) {
   const { user } = useAuth()
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <ChatDock />
       <Footer />
     </div>
   )

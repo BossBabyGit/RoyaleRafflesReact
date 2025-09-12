@@ -7,16 +7,19 @@ import './index.css'
 import { AuthProvider } from './context/AuthContext'
 import { RaffleProvider } from './context/RaffleContext'
   import { NotificationProvider } from './context/NotificationContext'
+import { ChatProvider } from './context/ChatContext'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <NotificationProvider>
-            <RaffleProvider>
-          <App />
-        </RaffleProvider>
-          </NotificationProvider>
+          <RaffleProvider>
+            <ChatProvider>
+              <App />
+            </ChatProvider>
+          </RaffleProvider>
+        </NotificationProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
