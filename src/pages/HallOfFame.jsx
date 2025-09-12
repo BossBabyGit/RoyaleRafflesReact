@@ -75,7 +75,7 @@ export default function HallOfFame() {
 
   return (
     <div className="py-8">
-      <section className="min-h-[70vh] flex flex-col items-center justify-center text-center">
+      <section className="flex flex-col items-center justify-center text-center">
         <h1 className="text-4xl md:text-6xl font-extrabold">Hall of Fame</h1>
         <p className="text-white/70 mt-4 max-w-md">Celebrating our top raffle legends.</p>
         <div className="mt-8 flex gap-3">
