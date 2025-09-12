@@ -7,25 +7,43 @@ function maskUsername(name, currentUser) {
   return name.length <= 3 ? name : name.slice(0,3) + '***'
 }
 
+function avatarColor(name) {
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  const hue = Math.abs(hash) % 360
+  return `hsl(${hue},70%,80%)`
+}
+
+function Avatar({ username }) {
+  return (
+    <div
+      className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+      style={{ backgroundColor: avatarColor(username) }}
+    >
+      {username.charAt(0).toUpperCase()}
+    </div>
+  )
+}
+
 export default function HallOfFame() {
   const { user, getAllUsers } = useAuth()
   const { raffles } = useRaffles()
-  const [range, setRange] = useState('week') // 'week' or 'month'
+  const [season, setSeason] = useState('week') // week, month, all
 
   const stats = useMemo(() => {
-    const days = range === 'week' ? 7 : 30
-    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000
+    const days = season === 'week' ? 7 : season === 'month' ? 30 : null
+    const cutoff = days ? Date.now() - days * 24 * 60 * 60 * 1000 : 0
 
     const tickets = {}
     const wins = {}
 
     raffles.forEach(r => {
-      if (r.endsAt >= cutoff) {
+      if (cutoff === 0 || r.endsAt >= cutoff) {
         r.entries?.forEach(e => {
           tickets[e.username] = (tickets[e.username] || 0) + e.count
         })
       }
-      if (r.ended && r.winner && r.endsAt >= cutoff) {
+      if (r.ended && r.winner && (cutoff === 0 || r.endsAt >= cutoff)) {
         wins[r.winner] = (wins[r.winner] || 0) + 1
       }
     })
@@ -51,21 +69,31 @@ export default function HallOfFame() {
       .slice(0,10)
 
     return { mostTickets, mostWins, luckiest }
-  }, [range, raffles, getAllUsers])
+  }, [season, raffles, getAllUsers])
 
-  const renderList = (list, formatter, maxValue) => {
-    if (!list.length) return <div className="text-center py-6 text-white/60">No data yet</div>
+  const medal = idx => idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : null
+
+  const renderList = (list, formatter) => {
+    if (!list.length) return <div className="text-center py-6 text-white/60">No champions yet... be the first!</div>
+    const maxValue = list[0]?.value || 1
     return (
       <ul className="space-y-3">
         {list.map((item, idx) => (
-          <li key={item.username}>
-            <div className="flex items-center gap-2">
-              <span className="w-5 text-sm">{idx + 1}.</span>
+          <li
+            key={item.username}
+            className="animate-fade-in-up"
+            style={{ animationDelay: `${idx * 80}ms` }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="w-5 text-sm">{idx + 1}</span>
+              <Avatar username={item.username} />
               <span className="flex-1 text-sm">{maskUsername(item.username, user)}</span>
-              <span className="text-sm font-medium">{formatter(item)}</span>
+              <span className="text-sm font-medium flex items-center gap-1">
+                {formatter(item)} {medal(idx)}
+              </span>
             </div>
             <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mt-1">
-              <div className="h-full bg-blue-light" style={{width: `${(item.value / (maxValue || 1)) * 100}%`}}></div>
+              <div className="h-full bg-blue-light" style={{width: `${(item.value / maxValue) * 100}%`}}></div>
             </div>
           </li>
         ))}
@@ -79,33 +107,74 @@ export default function HallOfFame() {
         <h1 className="text-4xl md:text-6xl font-extrabold">Hall of Fame</h1>
         <p className="text-white/70 mt-4 max-w-md">Celebrating our top raffle legends.</p>
         <div className="mt-8 flex gap-3">
-          <button
-            onClick={() => setRange('week')}
-            className={`px-4 py-2 rounded-xl transition ${range==='week' ? 'bg-blue text-white' : 'bg-white/10 hover:bg-white/20'}`}
-          >
-            This Week
+          <button onClick={() => setSeason('week')}
+            className={`px-4 py-2 rounded-xl transition ${
+              season==='week' ? 'bg-blue text-white' : 'bg-white/10 hover:bg-white/20'
+            }`}>
+            Current Week
           </button>
-          <button
-            onClick={() => setRange('month')}
-            className={`px-4 py-2 rounded-xl transition ${range==='month' ? 'bg-blue text-white' : 'bg-white/10 hover:bg-white/20'}`}
-          >
-            This Month
+          <button onClick={() => setSeason('month')}
+            className={`px-4 py-2 rounded-xl transition ${
+              season==='month' ? 'bg-blue text-white' : 'bg-white/10 hover:bg-white/20'
+            }`}>
+            Current Month
+          </button>
+          <button onClick={() => setSeason('all')}
+            className={`px-4 py-2 rounded-xl transition ${
+              season==='all' ? 'bg-blue text-white' : 'bg-white/10 hover:bg-white/20'
+            }`}>
+            All-Time
           </button>
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
+      {/* Season Champions */}
+      {stats.mostTickets[0] || stats.mostWins[0] || stats.luckiest[0] ? (
+        <section className="mt-10 grid gap-4 md:grid-cols-3">
+          {stats.mostTickets[0] && (
+            <div className="glass rounded-2xl p-4 flex flex-col items-center shadow-glow animate-fade-in-up">
+              <Avatar username={stats.mostTickets[0].username} />
+              <div className="mt-2 font-semibold flex items-center gap-1">
+                {maskUsername(stats.mostTickets[0].username, user)} <span>🥇</span>
+              </div>
+              <div className="text-sm text-white/60">Most Tickets</div>
+            </div>
+          )}
+          {stats.mostWins[0] && (
+            <div className="glass rounded-2xl p-4 flex flex-col items-center shadow-glow animate-fade-in-up">
+              <Avatar username={stats.mostWins[0].username} />
+              <div className="mt-2 font-semibold flex items-center gap-1">
+                {maskUsername(stats.mostWins[0].username, user)} <span>🥇</span>
+              </div>
+              <div className="text-sm text-white/60">Most Wins</div>
+            </div>
+          )}
+          {stats.luckiest[0] && (
+            <div className="glass rounded-2xl p-4 flex flex-col items-center shadow-glow animate-fade-in-up">
+              <Avatar username={stats.luckiest[0].username} />
+              <div className="mt-2 font-semibold flex items-center gap-1">
+                {maskUsername(stats.luckiest[0].username, user)} <span>🥇</span>
+              </div>
+              <div className="text-sm text-white/60">Luckiest</div>
+            </div>
+          )}
+        </section>
+      ) : (
+        <div className="text-center text-white/60 mt-10">No champions yet... be the first!</div>
+      )}
+
+      <section className="mt-10 grid gap-6 md:grid-cols-3">
         <div className="glass rounded-2xl p-6 border border-white/10 shadow-glow">
           <h3 className="font-semibold mb-4">🎟️ Most Tickets Bought</h3>
-          {renderList(stats.mostTickets, i => i.value, stats.mostTickets[0]?.value)}
+          {renderList(stats.mostTickets, i => i.value)}
         </div>
         <div className="glass rounded-2xl p-6 border border-white/10 shadow-glow">
           <h3 className="font-semibold mb-4">🏆 Most Wins</h3>
-          {renderList(stats.mostWins, i => i.value, stats.mostWins[0]?.value)}
+          {renderList(stats.mostWins, i => i.value)}
         </div>
         <div className="glass rounded-2xl p-6 border border-white/10 shadow-glow">
-          <h3 className="font-semibold mb-4">🍀 Luckiest</h3>
-          {renderList(stats.luckiest, i => `${Math.round(i.value * 100)}%`, stats.luckiest[0]?.value)}
+          <h3 className="font-semibold mb-4" title="Must have at least 5 tickets to qualify">🍀 Luckiest</h3>
+          {renderList(stats.luckiest, i => `${Math.round(i.value * 100)}%`)}
         </div>
       </section>
     </div>
