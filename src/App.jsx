@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import Auth from './pages/Auth'
 import Admin from './pages/Admin'
 import HallOfFame from './pages/HallOfFame'
+import CommunityVote from './pages/CommunityVote'
 import { useAuth } from './context/AuthContext'
 
 function PrivateRoute({ children }) {
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/raffles" element={<Raffles />} />
             <Route path="/raffles/:id" element={<RaffleDetails />} />
           <Route path="/hall-of-fame" element={<HallOfFame />} />
+          <Route path="/community-vote" element={<CommunityVote />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<Admin />} />
