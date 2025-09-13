@@ -98,36 +98,36 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
-  const getAllUsers = () => Object.values(loadUsers())
+  const getAllUsers = () => Object.values(loadUsers());
 
-    const getProfile = () => {
-    if (!user) return null
-    const users = loadUsers()
-    return users[user.username]
-  }
+  const getProfile = () => {
+    if (!user) return null;
+    const users = loadUsers();
+    return users[user.username];
+  };
 
   const updateProfile = (updater) => {
-    if (!user) return
-    const users = loadUsers()
-    users[user.username] = updater(users[user.username])
-    saveUsers(users)
-    setUser(u => (u ? { ...u } : null))
-  }
+    if (!user) return;
+    const users = loadUsers();
+    users[user.username] = updater(users[user.username]);
+    saveUsers(users);
+    setUser((u) => (u ? { ...u } : null));
+  };
 
   const toggleFavorite = (raffleId) => {
-    if (!user) return
-    updateProfile(u => {
-      const favs = new Set(u.favorites || [])
-      if (favs.has(raffleId)) favs.delete(raffleId)
-      else favs.add(raffleId)
-      return { ...u, favorites: Array.from(favs) }
-    })
-  }
+    if (!user) return;
+    updateProfile((u) => {
+      const favs = new Set(u.favorites || []);
+      if (favs.has(raffleId)) favs.delete(raffleId);
+      else favs.add(raffleId);
+      return { ...u, favorites: Array.from(favs) };
+    });
+  };
 
   const isFavorite = (raffleId) => {
-    const prof = getProfile()
-    return prof?.favorites?.includes(raffleId)
-  }
+    const prof = getProfile();
+    return prof?.favorites?.includes(raffleId);
+  };
 
   return (
     <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, toggleFavorite, isFavorite }}>
