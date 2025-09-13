@@ -8,6 +8,7 @@ export default function seed() {
       title: "iPhone 15 Pro 256GB",
       image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?q=80&w=1200&auto=format&fit=crop",
       description: "Flagship smartphone with A17 Pro chip.",
+      dioramaUrl: "/dioramas/sample.json",
       value: 1200,
       ticketPrice: 5,
       totalTickets: 100,
