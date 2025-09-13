@@ -5,6 +5,8 @@ import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
 import DepositModal from '../components/DepositModal'
 import { useTranslation } from 'react-i18next'
+import badges from '../data/badges'
+import BadgeGallery from '../components/BadgeGallery'
 
 export default function Dashboard() {
   const { getProfile, updateProfile } = useAuth()
@@ -14,6 +16,10 @@ export default function Dashboard() {
   const { notify, log } = useNotify()
   const profile = getProfile()
   const { t } = useTranslation()
+
+  const earnedBadges = useMemo(() => {
+    return badges.filter((b) => b.criteria(profile, raffles)).map((b) => b.id)
+  }, [profile, raffles])
 
   const myActive = useMemo(()=>{
     const ids = Object.keys(profile.entries || {}).map(n=>parseInt(n,10))
@@ -64,6 +70,8 @@ export default function Dashboard() {
           {(!profile.deposits || profile.deposits.length === 0) && <div className="text-white/60">{t('dashboard.noDeposits')}</div>}
         </div>
       </section>
+
+      <BadgeGallery earned={earnedBadges} username={profile.username} />
 
       <section className="glass rounded-2xl p-6">
         <h3 className="text-xl font-semibold">{t('dashboard.activeEntries')}</h3>
