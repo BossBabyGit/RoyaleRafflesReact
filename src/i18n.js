@@ -1,0 +1,289 @@
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+
+const resources = {
+  en: {
+    translation: {
+      header: {
+        home: 'Home',
+        raffles: 'Raffles',
+        community: 'Community Vote',
+        hall: 'Hall of Fame',
+        account: 'My Account',
+        admin: 'Admin',
+        balance: 'Balance',
+        logout: 'Logout',
+        login: 'Login',
+        language: 'Language'
+      },
+      auth: {
+        login: 'Login',
+        register: 'Register',
+        demo: 'Use <b>demo/demo</b> to log in with a preloaded balance.',
+        username: 'Username',
+        password: 'Password',
+        createAccount: 'Create account',
+        needAccount: 'Need an account? Register',
+        haveAccount: 'Have an account? Login'
+      },
+      home: {
+        tagline: 'Play • Win • Repeat',
+        description: 'Enter raffles using your on-site balance, discover trending prizes, and track your wins — all in one playful, modern experience.',
+        browse: 'Browse Raffles',
+        login: 'Login / Register',
+        ticketsSold: 'Tickets sold:',
+        activeRaffles: 'Active raffles:',
+        winners: 'Winners:',
+        howItWorks: 'How it works',
+        step1: 'Top up your on-site balance.',
+        step2: 'Pick a raffle & choose your tickets.',
+        step3: 'Watch the countdown — winners are drawn fairly.',
+        maxPerUser: 'Max per user: <b>50%</b> of total tickets per raffle.',
+        secureTopups: 'Secure Top-Ups',
+        fairDraws: 'Fair Draws',
+        instantEntry: 'Instant Entry',
+        topRaffles: "This Week's Top Raffles",
+        trustSecure: 'Secure Top-Ups',
+        trustFair: 'Fair, random winners',
+        trustInstant: 'Instant ticket purchase'
+      },
+      raffles: {
+        search: 'Search raffles...',
+        all: 'All',
+        active: 'Active',
+        ended: 'Ended',
+        endingSoon: 'Ending Soon',
+        mostPopular: 'Most Popular',
+        prizeValue: 'Prize Value'
+      },
+      raffleDetails: {
+        notFound: 'Raffle not found',
+        notFoundDesc: "This raffle doesn't exist. Go back to the raffles list.",
+        estimated: 'Estimated value:',
+        ticketPrice: 'Ticket price:',
+        progress: 'Progress:',
+        timeLeft: 'Time left:',
+        yourTickets: 'Your tickets:',
+        maxPerUser: 'Max per user:',
+        back: 'Back',
+        enter: 'Enter Raffle',
+        participants: 'Participants',
+        recentEntries: 'Recent entries (anonymized):',
+        noEntries: 'No entries yet. Be the first!',
+        ended: 'Ended'
+      },
+      dashboard: {
+        myWallet: 'My Wallet',
+        currentBalance: 'Current Balance:',
+        topUp: 'Top up',
+        noDeposits: 'No deposits yet.',
+        activeEntries: 'Active Entries',
+        yourTickets: 'Your tickets:',
+        noActiveEntries: 'No active entries yet.',
+        endedRaffles: 'Ended Raffles',
+        winner: 'Winner:',
+        noEnded: 'No ended raffles yet.',
+        wins: 'Wins',
+        youWon: 'You won this raffle! 🎉',
+        noWins: 'No wins yet. Good luck!'
+      },
+      communityVote: {
+        title: 'Community Vote',
+        vote: 'Vote',
+        changeVote: 'Change vote',
+        pollEndsIn: 'Poll ends in',
+        votingClosed: 'Voting closed',
+        youVoted: 'You voted for {{option}}',
+        winner: 'Voting closed. Winner: {{option}}',
+        voteFor: 'Vote for {{option}}'
+      },
+      hallOfFame: {
+        title: 'Hall of Fame',
+        tagline: 'Celebrating our top raffle legends.',
+        currentWeek: 'Current Week',
+        currentMonth: 'Current Month',
+        allTime: 'All-Time',
+        noChampions: 'No champions yet... be the first!',
+        mostTickets: 'Most Tickets Bought',
+        mostWins: 'Most Wins',
+        luckiest: 'Luckiest',
+        championMostTickets: 'Most Tickets',
+        championMostWins: 'Most Wins',
+        championLuckiest: 'Luckiest'
+      },
+      admin: {
+        raffles: 'Raffles',
+        users: 'Users',
+        analytics: 'Analytics',
+        manageRaffles: 'Manage Raffles',
+        newRaffle: '+ New Raffle',
+        edit: 'Edit',
+        endNow: 'End Now',
+        ended: 'Ended',
+        editRaffle: 'Edit Raffle',
+        newRaffleTitle: 'New Raffle',
+        title: 'Title',
+        imageUrl: 'Image URL',
+        description: 'Description',
+        value: 'Value',
+        ticketPrice: 'Ticket Price',
+        totalTickets: 'Total Tickets',
+        category: 'Category',
+        cancel: 'Cancel',
+        save: 'Save',
+        username: 'Username',
+        balance: 'Balance',
+        admin: 'Admin',
+        yes: 'Yes',
+        no: 'No'
+      }
+    }
+  },
+  es: {
+    translation: {
+      header: {
+        home: 'Inicio',
+        raffles: 'Rifas',
+        community: 'Votación comunitaria',
+        hall: 'Salón de la Fama',
+        account: 'Mi cuenta',
+        admin: 'Admin',
+        balance: 'Balance',
+        logout: 'Cerrar sesión',
+        login: 'Iniciar sesión',
+        language: 'Idioma'
+      },
+      auth: {
+        login: 'Iniciar sesión',
+        register: 'Registrarse',
+        demo: 'Usa <b>demo/demo</b> para iniciar con saldo precargado.',
+        username: 'Usuario',
+        password: 'Contraseña',
+        createAccount: 'Crear cuenta',
+        needAccount: '¿Necesitas una cuenta? Regístrate',
+        haveAccount: '¿Tienes una cuenta? Inicia sesión'
+      },
+      home: {
+        tagline: 'Juega • Gana • Repite',
+        description: 'Entra a rifas con tu saldo, descubre premios de moda y sigue tus victorias — todo en una experiencia moderna.',
+        browse: 'Ver Rifas',
+        login: 'Iniciar / Registrar',
+        ticketsSold: 'Boletos vendidos:',
+        activeRaffles: 'Rifas activas:',
+        winners: 'Ganadores:',
+        howItWorks: 'Cómo funciona',
+        step1: 'Recarga tu saldo en el sitio.',
+        step2: 'Elige una rifa y compra boletos.',
+        step3: 'Mira la cuenta regresiva — los ganadores se eligen justamente.',
+        maxPerUser: 'Máximo por usuario: <b>50%</b> de los boletos totales por rifa.',
+        secureTopups: 'Recargas seguras',
+        fairDraws: 'Sorteos justos',
+        instantEntry: 'Entrada instantánea',
+        topRaffles: 'Las mejores rifas de esta semana',
+        trustSecure: 'Recargas seguras',
+        trustFair: 'Ganadores justos y aleatorios',
+        trustInstant: 'Compra de boletos instantánea'
+      },
+      raffles: {
+        search: 'Buscar rifas...',
+        all: 'Todas',
+        active: 'Activas',
+        ended: 'Finalizadas',
+        endingSoon: 'Termina pronto',
+        mostPopular: 'Más populares',
+        prizeValue: 'Valor del premio'
+      },
+      raffleDetails: {
+        notFound: 'Rifa no encontrada',
+        notFoundDesc: 'Esta rifa no existe. Regresa a la lista de rifas.',
+        estimated: 'Valor estimado:',
+        ticketPrice: 'Precio del boleto:',
+        progress: 'Progreso:',
+        timeLeft: 'Tiempo restante:',
+        yourTickets: 'Tus boletos:',
+        maxPerUser: 'Máx por usuario:',
+        back: 'Volver',
+        enter: 'Entrar a la rifa',
+        participants: 'Participantes',
+        recentEntries: 'Entradas recientes (anonimizadas):',
+        noEntries: 'Sin entradas aún. ¡Sé el primero!',
+        ended: 'Finalizada'
+      },
+      dashboard: {
+        myWallet: 'Mi Billetera',
+        currentBalance: 'Saldo actual:',
+        topUp: 'Recargar',
+        noDeposits: 'Sin depósitos aún.',
+        activeEntries: 'Entradas activas',
+        yourTickets: 'Tus boletos:',
+        noActiveEntries: 'Sin entradas activas.',
+        endedRaffles: 'Rifas finalizadas',
+        winner: 'Ganador:',
+        noEnded: 'Sin rifas finalizadas.',
+        wins: 'Ganadas',
+        youWon: '¡Ganaste esta rifa! 🎉',
+        noWins: 'Aún sin victorias. ¡Suerte!'
+      },
+      communityVote: {
+        title: 'Votación comunitaria',
+        vote: 'Votar',
+        changeVote: 'Cambiar voto',
+        pollEndsIn: 'La encuesta termina en',
+        votingClosed: 'Votación cerrada',
+        youVoted: 'Votaste por {{option}}',
+        winner: 'Votación cerrada. Ganador: {{option}}',
+        voteFor: 'Votar por {{option}}'
+      },
+      hallOfFame: {
+        title: 'Salón de la Fama',
+        tagline: 'Celebrando a nuestros mejores concursantes.',
+        currentWeek: 'Semana actual',
+        currentMonth: 'Mes actual',
+        allTime: 'Histórico',
+        noChampions: 'Sin campeones aún... ¡sé el primero!',
+        mostTickets: 'Más boletos comprados',
+        mostWins: 'Más victorias',
+        luckiest: 'Más suertudos',
+        championMostTickets: 'Más boletos',
+        championMostWins: 'Más victorias',
+        championLuckiest: 'Más suertudo'
+      },
+      admin: {
+        raffles: 'Rifas',
+        users: 'Usuarios',
+        analytics: 'Analítica',
+        manageRaffles: 'Administrar rifas',
+        newRaffle: '+ Nueva rifa',
+        edit: 'Editar',
+        endNow: 'Terminar ahora',
+        ended: 'Finalizada',
+        editRaffle: 'Editar rifa',
+        newRaffleTitle: 'Nueva rifa',
+        title: 'Título',
+        imageUrl: 'URL de imagen',
+        description: 'Descripción',
+        value: 'Valor',
+        ticketPrice: 'Precio del boleto',
+        totalTickets: 'Boletos totales',
+        category: 'Categoría',
+        cancel: 'Cancelar',
+        save: 'Guardar',
+        username: 'Usuario',
+        balance: 'Saldo',
+        admin: 'Admin',
+        yes: 'Sí',
+        no: 'No'
+      }
+    }
+  }
+}
+
+i18n.use(initReactI18next).init({
+  resources,
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: { escapeValue: false }
+})
+
+export default i18n
+

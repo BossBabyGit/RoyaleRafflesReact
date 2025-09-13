@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
 import DepositModal from '../components/DepositModal'
+import { useTranslation } from 'react-i18next'
 
 export default function Dashboard() {
   const { getProfile, updateProfile } = useAuth()
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const [showDeposit, setShowDeposit] = useState(false)
   const { notify, log } = useNotify()
   const profile = getProfile()
+  const { t } = useTranslation()
 
   const myActive = useMemo(()=>{
     const ids = Object.keys(profile.entries || {}).map(n=>parseInt(n,10))
@@ -46,11 +48,11 @@ export default function Dashboard() {
   return (
     <div className="py-8 space-y-8">
       <section className="glass rounded-2xl p-6">
-        <h2 className="text-2xl font-bold">My Wallet</h2>
-        <div className="mt-2 text-white/80">Current Balance: <b className="text-blue-light">${profile.balance.toFixed(2)}</b></div>
+        <h2 className="text-2xl font-bold">{t('dashboard.myWallet')}</h2>
+        <div className="mt-2 text-white/80">{t('dashboard.currentBalance')} <b className="text-blue-light">${profile.balance.toFixed(2)}</b></div>
         <div className="mt-3 flex items-center gap-2">
           <input type="number" min="1" value={amt} onChange={e=>setAmt(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"/>
-          <button onClick={openDeposit} className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">Top up</button>
+          <button onClick={openDeposit} className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">{t('dashboard.topUp')}</button>
         </div>
         <div className="mt-4 space-y-1 text-sm text-white/70">
           {(profile.deposits || []).map(d => (
@@ -59,12 +61,12 @@ export default function Dashboard() {
               <span className="text-blue-light">${d.amount.toFixed(2)}</span>
             </div>
           ))}
-          {(!profile.deposits || profile.deposits.length === 0) && <div className="text-white/60">No deposits yet.</div>}
+          {(!profile.deposits || profile.deposits.length === 0) && <div className="text-white/60">{t('dashboard.noDeposits')}</div>}
         </div>
       </section>
 
       <section className="glass rounded-2xl p-6">
-        <h3 className="text-xl font-semibold">Active Entries</h3>
+        <h3 className="text-xl font-semibold">{t('dashboard.activeEntries')}</h3>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {myActive.map(r => (
             <div key={r.id} className="p-4 border border-white/10 rounded-xl bg-black/20">
@@ -72,39 +74,39 @@ export default function Dashboard() {
                 <img src={r.image} className="w-16 h-16 object-cover rounded-lg" />
                 <div>
                   <div className="font-semibold">{r.title}</div>
-                  <div className="text-sm text-white/70">Your tickets: <b>{profile.entries[r.id]}</b></div>
+                  <div className="text-sm text-white/70">{t('dashboard.yourTickets')} <b>{profile.entries[r.id]}</b></div>
                 </div>
               </div>
             </div>
           ))}
-          {myActive.length===0 && <div className="text-white/60">No active entries yet.</div>}
+          {myActive.length===0 && <div className="text-white/60">{t('dashboard.noActiveEntries')}</div>}
         </div>
       </section>
 
       <section className="glass rounded-2xl p-6">
-        <h3 className="text-xl font-semibold">Ended Raffles</h3>
+        <h3 className="text-xl font-semibold">{t('dashboard.endedRaffles')}</h3>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {myEnded.map(r => (
             <div key={r.id} className="p-4 border border-white/10 rounded-xl bg-black/20">
               <div className="font-semibold">{r.title}</div>
-              <div className="text-sm text-white/70">Your tickets: <b>{profile.entries[r.id]}</b></div>
-              <div className="text-sm mt-1">Winner: <b className={r.winner===profile.username?"text-blue-light":"text-white/80"}>{r.winner || "TBD"}</b></div>
+              <div className="text-sm text-white/70">{t('dashboard.yourTickets')} <b>{profile.entries[r.id]}</b></div>
+              <div className="text-sm mt-1">{t('dashboard.winner')} <b className={r.winner===profile.username?"text-blue-light":"text-white/80"}>{r.winner || "TBD"}</b></div>
             </div>
           ))}
-          {myEnded.length===0 && <div className="text-white/60">No ended raffles yet.</div>}
+          {myEnded.length===0 && <div className="text-white/60">{t('dashboard.noEnded')}</div>}
         </div>
       </section>
 
       <section className="glass rounded-2xl p-6">
-        <h3 className="text-xl font-semibold">Wins</h3>
+        <h3 className="text-xl font-semibold">{t('dashboard.wins')}</h3>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {myWins.map(r => (
             <div key={r.id} className="p-4 border border-white/10 rounded-xl bg-black/20">
               <div className="font-semibold">{r.title}</div>
-              <div className="text-sm text-white/70">You won this raffle! 🎉</div>
+              <div className="text-sm text-white/70">{t('dashboard.youWon')}</div>
             </div>
           ))}
-          {myWins.length===0 && <div className="text-white/60">No wins yet. Good luck!</div>}
+          {myWins.length===0 && <div className="text-white/60">{t('dashboard.noWins')}</div>}
         </div>
       </section>
       {showDeposit && (

@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useRaffles } from '../context/RaffleContext'
 import { useAuth } from '../context/AuthContext'
 import BuyModal from '../components/BuyModal'
+import { useTranslation } from 'react-i18next'
 
 function mask(name) {
   if (!name) return ''
@@ -32,6 +33,7 @@ export default function RaffleDetails() {
   const { raffles, purchase } = useRaffles()
   const { user, getProfile } = useAuth()
   const nav = useNavigate()
+  const { t } = useTranslation()
 
   const r = useMemo(()=> raffles.find(x => String(x.id) === String(id)), [raffles, id])
   const [open, setOpen] = useState(false)
@@ -40,8 +42,8 @@ export default function RaffleDetails() {
     return (
       <div className="py-10">
         <div className="glass rounded-2xl p-6">
-          <h2 className="text-2xl font-bold">Raffle not found</h2>
-          <p className="text-white/70 mt-2">This raffle doesn't exist. Go back to the <Link className="text-blue-light underline" to="/raffles">raffles</Link> list.</p>
+          <h2 className="text-2xl font-bold">{t('raffleDetails.notFound')}</h2>
+          <p className="text-white/70 mt-2">{t('raffleDetails.notFoundDesc')} <Link className="text-blue-light underline" to="/raffles">{t('header.raffles')}</Link></p>
         </div>
       </div>
     )
@@ -61,32 +63,32 @@ export default function RaffleDetails() {
         <div className="glass rounded-2xl p-6 space-y-3">
           <h1 className="text-3xl font-extrabold">{r.title}</h1>
           <p className="text-white/70">{r.description}</p>
-          <div className="text-sm text-white/80">Estimated value: <b className="text-white">${r.value}</b></div>
-          <div className="text-sm text-white/80">Ticket price: <b className="text-blue-light">${r.ticketPrice.toFixed(2)}</b></div>
-          <div className="text-sm text-white/80">Progress: <b>{r.sold}</b> / {r.totalTickets} sold</div>
-          <div className="text-sm text-white/80">Time left: <b><Countdown endsAt={r.endsAt} ended={r.ended} /></b></div>
+          <div className="text-sm text-white/80">{t('raffleDetails.estimated')} <b className="text-white">${r.value}</b></div>
+          <div className="text-sm text-white/80">{t('raffleDetails.ticketPrice')} <b className="text-blue-light">${r.ticketPrice.toFixed(2)}</b></div>
+          <div className="text-sm text-white/80">{t('raffleDetails.progress')} <b>{r.sold}</b> / {r.totalTickets} sold</div>
+          <div className="text-sm text-white/80">{t('raffleDetails.timeLeft')} <b><Countdown endsAt={r.endsAt} ended={r.ended} /></b></div>
           {user && (
-            <div className="text-sm text-white/80">Your tickets: <b>{youHave}</b> • Max per user: <b>{maxPerUser}</b></div>
+            <div className="text-sm text-white/80">{t('raffleDetails.yourTickets')} <b>{youHave}</b> • {t('raffleDetails.maxPerUser')} <b>{maxPerUser}</b></div>
           )}
           <div className="pt-2 flex gap-3">
-            <button onClick={()=>nav(-1)} className="px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20">Back</button>
+            <button onClick={()=>nav(-1)} className="px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20">{t('raffleDetails.back')}</button>
             <button disabled={r.ended || available<=0} onClick={()=>setOpen(true)} className="px-4 py-2 rounded-2xl bg-claret hover:bg-claret-light disabled:opacity-50 disabled:cursor-not-allowed">
-              {r.ended ? 'Ended' : 'Enter Raffle'}
+              {r.ended ? t('raffleDetails.ended') : t('raffleDetails.enter')}
             </button>
           </div>
         </div>
       </div>
 
       <div className="glass rounded-2xl p-6">
-        <h2 className="text-xl font-semibold">Participants</h2>
-        <p className="text-white/70 text-sm">Recent entries (anonymized):</p>
+        <h2 className="text-xl font-semibold">{t('raffleDetails.participants')}</h2>
+        <p className="text-white/70 text-sm">{t('raffleDetails.recentEntries')}</p>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {(r.entries && r.entries.length>0) ? r.entries.map((e, i)=>(
             <div key={i} className="p-3 rounded-xl bg-black/20 border border-white/10 flex items-center justify-between">
               <span className="text-white/80">{mask(e.username)}</span>
               <span className="text-white/60 text-sm">× {e.count}</span>
             </div>
-          )) : <div className="text-white/60">No entries yet. Be the first!</div>}
+          )) : <div className="text-white/60">{t('raffleDetails.noEntries')}</div>}
         </div>
       </div>
 

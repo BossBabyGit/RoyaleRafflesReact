@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNotify } from '../context/NotificationContext'
+import { useTranslation } from 'react-i18next'
 
 // Lightweight confetti helper using emoji burst
 function confetti() {
@@ -42,6 +43,7 @@ function Countdown({ endsAt, onEnd }) {
 }
 
 function OptionCard({ option, selected, onVote, disabled }) {
+  const { t } = useTranslation()
   return (
     <div className="glass rounded-2xl p-4 flex flex-col items-center text-center space-y-3 relative">
       {option.image ? (
@@ -53,14 +55,14 @@ function OptionCard({ option, selected, onVote, disabled }) {
       <button
         onClick={() => onVote(option.id)}
         disabled={disabled}
-        aria-label={`Vote for ${option.label}`}
+        aria-label={t('communityVote.voteFor', { option: option.label })}
         className={
           'px-4 py-1.5 rounded-xl transition ' +
           (selected ? 'bg-claret hover:bg-claret-light' : 'bg-blue hover:bg-blue-light') +
           (disabled ? ' opacity-50 cursor-not-allowed' : '')
         }
       >
-        {selected ? 'Change vote' : 'Vote'}
+        {selected ? t('communityVote.changeVote') : t('communityVote.vote')}
       </button>
     </div>
   )
@@ -100,6 +102,7 @@ function Results({ options, tallies, totalVotes, winningOptionId, closed }) {
 export default function CommunityVote() {
   const { user } = useAuth()
   const { notify, log } = useNotify()
+  const { t } = useTranslation()
 
   const poll = {
     id: 'poll_001',
@@ -165,7 +168,7 @@ export default function CommunityVote() {
       localStorage.setItem(storageKey, JSON.stringify(next))
       return next
     })
-    notify(`You voted for ${optionLabel}`)
+    notify(t('communityVote.youVoted', { option: optionLabel }))
     log({ type: 'vote', pollId: poll.id, voter: voterId, option: optionId })
   }
 
@@ -180,21 +183,21 @@ export default function CommunityVote() {
     confetti()
     log({ type: 'poll-ended', pollId: poll.id, winner: win })
     const label = poll.options.find((o) => o.id === win)?.label
-    notify(`Voting closed. Winner: ${label}`)
+    notify(t('communityVote.winner', { option: label }))
   }
 
   return (
     <div className="py-8">
       {/* HERO */}
       <section className="min-h-[70vh] flex flex-col items-center justify-center text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold">Community Vote</h1>
+        <h1 className="text-4xl md:text-5xl font-extrabold">{t('communityVote.title')}</h1>
         <p className="text-white/70 max-w-xl">{poll.title}</p>
         {!closed ? (
           <div className="text-xl">
-            Poll ends in <Countdown endsAt={poll.endsAt} onEnd={handleEnd} />
+            {t('communityVote.pollEndsIn')} <Countdown endsAt={poll.endsAt} onEnd={handleEnd} />
           </div>
         ) : (
-          <div className="text-xl">Voting closed</div>
+          <div className="text-xl">{t('communityVote.votingClosed')}</div>
         )}
       </section>
 

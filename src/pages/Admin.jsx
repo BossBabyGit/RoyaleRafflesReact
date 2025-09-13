@@ -4,21 +4,23 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
+import { useTranslation } from 'react-i18next'
 
 export default function Admin() {
   const { user, getAllUsers } = useAuth()
   const { raffles, upsertRaffle, endRaffleManually } = useRaffles()
   const { notify } = useNotify()
   const [tab, setTab] = useState('raffles')
+  const { t } = useTranslation()
 
   if (!user || !user.isAdmin) return <Navigate to="/auth" replace />
 
   return (
     <div className="py-8 space-y-6">
       <div className="glass p-4 rounded-2xl flex items-center gap-2">
-        <button className={"px-3 py-1.5 rounded-xl " + (tab==='raffles'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('raffles')}>Raffles</button>
-        <button className={"px-3 py-1.5 rounded-xl " + (tab==='users'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('users')}>Users</button>
-        <button className={"px-3 py-1.5 rounded-xl " + (tab==='analytics'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('analytics')}>Analytics</button>
+        <button className={"px-3 py-1.5 rounded-xl " + (tab==='raffles'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('raffles')}>{t('admin.raffles')}</button>
+        <button className={"px-3 py-1.5 rounded-xl " + (tab==='users'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('users')}>{t('admin.users')}</button>
+        <button className={"px-3 py-1.5 rounded-xl " + (tab==='analytics'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('analytics')}>{t('admin.analytics')}</button>
       </div>
       {tab==='raffles' && <RafflesAdmin raffles={raffles} onSave={(r)=>{upsertRaffle(r); notify('Raffle saved')}} onEnd={(id)=>{endRaffleManually(id); notify('Raffle ended')}} />}
       {tab==='users' && <UsersAdmin users={getAllUsers()} />}
@@ -29,13 +31,14 @@ export default function Admin() {
 
 function RafflesAdmin({ raffles, onSave, onEnd }) {
   const [editing, setEditing] = useState(null)
+  const { t } = useTranslation()
   const blank = { title:'', image:'', description:'', value:0, ticketPrice:1, totalTickets:100, endsAt: Date.now()+86400000, category:'General' }
 
   return (
     <div className="glass rounded-2xl p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold">Manage Raffles</h3>
-        <button className="px-3 py-1.5 rounded-xl bg-blue hover:bg-blue-light" onClick={()=>setEditing(blank)}>+ New Raffle</button>
+        <h3 className="text-xl font-semibold">{t('admin.manageRaffles')}</h3>
+        <button className="px-3 py-1.5 rounded-xl bg-blue hover:bg-blue-light" onClick={()=>setEditing(blank)}>{t('admin.newRaffle')}</button>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {raffles.map(r => (
@@ -44,8 +47,8 @@ function RafflesAdmin({ raffles, onSave, onEnd }) {
             <div className="text-sm text-white/70">Sold {r.sold}/{r.totalTickets} • Ticket ${r.ticketPrice}</div>
             <div className="text-sm">Ends: {new Date(r.endsAt).toLocaleString()}</div>
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={()=>setEditing(r)}>Edit</button>
-              <button disabled={r.ended} className="px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light disabled:opacity-50" onClick={()=>onEnd(r.id)}>{r.ended?'Ended':'End Now'}</button>
+              <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={()=>setEditing(r)}>{t('admin.edit')}</button>
+              <button disabled={r.ended} className="px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light disabled:opacity-50" onClick={()=>onEnd(r.id)}>{r.ended?t('admin.ended'):t('admin.endNow')}</button>
             </div>
           </div>
         ))}
@@ -57,27 +60,28 @@ function RafflesAdmin({ raffles, onSave, onEnd }) {
 
 function RaffleEditor({ data, onClose, onSave }) {
   const [form, setForm] = useState({ ...data })
+  const { t } = useTranslation()
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur flex items-center justify-center z-50 p-4">
       <div className="glass rounded-2xl w-full max-w-2xl p-6 space-y-3">
         <div className="flex items-start justify-between">
-          <h3 className="text-xl font-semibold">{form.id?'Edit Raffle':'New Raffle'}</h3>
+          <h3 className="text-xl font-semibold">{form.id?t('admin.editRaffle'):t('admin.newRaffleTitle')}</h3>
           <button onClick={onClose} className="text-white/60 hover:text-white">✕</button>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder="Title" value={form.title} onChange={e=>set('title', e.target.value)} />
-          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder="Image URL" value={form.image} onChange={e=>set('image', e.target.value)} />
-          <textarea className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder="Description" value={form.description} onChange={e=>set('description', e.target.value)} />
-          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder="Value" value={form.value} onChange={e=>set('value', parseFloat(e.target.value||0))} />
-          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder="Ticket Price" value={form.ticketPrice} onChange={e=>set('ticketPrice', parseFloat(e.target.value||0))} />
-          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder="Total Tickets" value={form.totalTickets} onChange={e=>set('totalTickets', parseInt(e.target.value||0,10))} />
+          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder={t('admin.title')} value={form.title} onChange={e=>set('title', e.target.value)} />
+          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder={t('admin.imageUrl')} value={form.image} onChange={e=>set('image', e.target.value)} />
+          <textarea className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder={t('admin.description')} value={form.description} onChange={e=>set('description', e.target.value)} />
+          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder={t('admin.value')} value={form.value} onChange={e=>set('value', parseFloat(e.target.value||0))} />
+          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder={t('admin.ticketPrice')} value={form.ticketPrice} onChange={e=>set('ticketPrice', parseFloat(e.target.value||0))} />
+          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder={t('admin.totalTickets')} value={form.totalTickets} onChange={e=>set('totalTickets', parseInt(e.target.value||0,10))} />
           <input type="datetime-local" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" value={new Date(form.endsAt).toISOString().slice(0,16)} onChange={e=>set('endsAt', new Date(e.target.value).getTime())} />
-          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder="Category" value={form.category||'General'} onChange={e=>set('category', e.target.value)} />
+          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder={t('admin.category')} value={form.category||'General'} onChange={e=>set('category', e.target.value)} />
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={onClose}>Cancel</button>
-          <button className="px-3 py-1.5 rounded-xl bg-blue hover:bg-blue-light" onClick={()=>onSave(form)}>Save</button>
+          <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={onClose}>{t('admin.cancel')}</button>
+          <button className="px-3 py-1.5 rounded-xl bg-blue hover:bg-blue-light" onClick={()=>onSave(form)}>{t('admin.save')}</button>
         </div>
       </div>
     </div>
@@ -85,16 +89,17 @@ function RaffleEditor({ data, onClose, onSave }) {
 }
 
 function UsersAdmin({ users }) {
+  const { t } = useTranslation()
   return (
     <div className="glass rounded-2xl p-6 space-y-4">
-      <h3 className="text-xl font-semibold">Users</h3>
+      <h3 className="text-xl font-semibold">{t('admin.users')}</h3>
       <div className="overflow-auto">
         <table className="w-full text-sm">
           <thead className="text-white/70">
             <tr>
-              <th className="text-left p-2">Username</th>
-              <th className="text-left p-2">Balance</th>
-              <th className="text-left p-2">Admin</th>
+              <th className="text-left p-2">{t('admin.username')}</th>
+              <th className="text-left p-2">{t('admin.balance')}</th>
+              <th className="text-left p-2">{t('admin.admin')}</th>
             </tr>
           </thead>
           <tbody>
@@ -102,7 +107,7 @@ function UsersAdmin({ users }) {
               <tr key={u.username} className="border-t border-white/10">
                 <td className="p-2">{u.username}</td>
                 <td className="p-2">${(u.balance||0).toFixed(2)}</td>
-                <td className="p-2">{u.isAdmin?'Yes':'No'}</td>
+                <td className="p-2">{u.isAdmin?t('admin.yes'):t('admin.no')}</td>
               </tr>
             ))}
           </tbody>
