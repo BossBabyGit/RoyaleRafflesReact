@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useRaffles } from '../context/RaffleContext'
 import { useAuth } from '../context/AuthContext'
 import BuyModal from '../components/BuyModal'
+import ShareModal from '../components/ShareModal'
 import { useTranslation } from 'react-i18next'
 
 function mask(name) {
@@ -37,6 +38,7 @@ export default function RaffleDetails() {
 
   const r = useMemo(()=> raffles.find(x => String(x.id) === String(id)), [raffles, id])
   const [open, setOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
 
   if (!r) {
     return (
@@ -55,19 +57,10 @@ export default function RaffleDetails() {
   const available = r.totalTickets - r.sold
   const freeClaimed = profile?.freeEntries?.[r.id]
 
-  const handleShare = async () => {
-    const shareText = `I joined this raffle for free on Royale Raffles! ${window.location.origin}/raffles/${r.id}`
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: r.title, text: shareText, url: window.location.origin + '/raffles/' + r.id })
-      } else {
-        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`
-        window.open(url, '_blank')
-      }
-      claimFreeTicket(r.id)
-    } catch (e) {
-      // ignore cancelled share
-    }
+  const shareText = `I joined this raffle for free on Royale Raffles! ${window.location.origin}/raffles/${r.id}`
+  const shareUrl = window.location.origin + '/raffles/' + r.id
+  const handleShared = () => {
+    claimFreeTicket(r.id)
   }
 
   return (
@@ -88,7 +81,7 @@ export default function RaffleDetails() {
           )}
           <div className="pt-2 flex gap-3 flex-wrap">
             <button onClick={()=>nav(-1)} className="px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20">{t('raffleDetails.back')}</button>
-            <button disabled={r.ended || available<=0 || freeClaimed} onClick={handleShare} className="px-4 py-2 rounded-2xl bg-blue-light hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-black">
+            <button disabled={r.ended || available<=0 || freeClaimed} onClick={()=>setShareOpen(true)} className="px-4 py-2 rounded-2xl bg-blue-light hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-black">
               {freeClaimed ? 'Free Ticket Claimed' : 'Share & Free Ticket'}
             </button>
             <button disabled={r.ended || available<=0} onClick={()=>setOpen(true)} className="px-4 py-2 rounded-2xl bg-claret hover:bg-claret-light disabled:opacity-50 disabled:cursor-not-allowed">
@@ -112,6 +105,7 @@ export default function RaffleDetails() {
       </div>
 
       {open && <BuyModal r={r} onClose={()=>setOpen(false)} onPurchase={purchase} />}
+      {shareOpen && <ShareModal shareText={shareText} url={shareUrl} onClose={()=>setShareOpen(false)} onShared={handleShared} />}
     </div>
   )
 }
