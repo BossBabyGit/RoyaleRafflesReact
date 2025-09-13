@@ -1,11 +1,13 @@
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, lazy, Suspense } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useRaffles } from '../context/RaffleContext'
 import { useAuth } from '../context/AuthContext'
 import BuyModal from '../components/BuyModal'
 import ShareModal from '../components/ShareModal'
 import { useTranslation } from 'react-i18next'
+
+const PrizeDiorama = lazy(() => import('../components/PrizeDiorama'))
 
 function mask(name) {
   if (!name) return ''
@@ -68,6 +70,11 @@ export default function RaffleDetails() {
       <div className="grid md:grid-cols-2 gap-6">
         <div className="glass rounded-2xl overflow-hidden">
           <img src={r.image} alt={r.title} className="w-full h-80 object-cover" />
+          {r.dioramaUrl && (
+            <Suspense fallback={null}>
+              <PrizeDiorama src={r.dioramaUrl} className="w-full h-80" />
+            </Suspense>
+          )}
         </div>
         <div className="glass rounded-2xl p-6 space-y-3">
           <h1 className="text-3xl font-extrabold">{r.title}</h1>
