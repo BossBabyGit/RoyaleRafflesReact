@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useRaffles } from '../context/RaffleContext'
@@ -157,6 +157,37 @@ function RaffleEditor({ data, onClose, onSave }) {
 
 function UsersAdmin({ users }) {
   const { t } = useTranslation()
+  const { getAllUsers, updateUser, toggleAdmin, deleteUser } = useAuth()
+  const { notify } = useNotify()
+  const [list, setList] = useState(users)
+  const [editing, setEditing] = useState(null)
+
+  useEffect(() => setList(users), [users])
+
+  const refresh = () => setList(getAllUsers())
+
+  const handleSave = (username, updates) => {
+    updateUser(username, updates)
+    refresh()
+    notify('User updated')
+  }
+
+  const handleToggle = (u) => {
+    if (window.confirm(t('admin.confirmToggleAdmin'))) {
+      toggleAdmin(u.username)
+      refresh()
+      notify('Admin status changed')
+    }
+  }
+
+  const handleDelete = (u) => {
+    if (window.confirm(t('admin.confirmDelete'))) {
+      deleteUser(u.username)
+      refresh()
+      notify('User deleted')
+    }
+  }
+
   return (
     <div className="glass rounded-2xl p-6 space-y-4">
       <h3 className="text-xl font-semibold">{t('admin.users')}</h3>
@@ -167,18 +198,62 @@ function UsersAdmin({ users }) {
               <th className="text-left p-2">{t('admin.username')}</th>
               <th className="text-left p-2">{t('admin.balance')}</th>
               <th className="text-left p-2">{t('admin.admin')}</th>
+              <th className="text-left p-2">{t('admin.actions')}</th>
             </tr>
           </thead>
           <tbody>
-            {users.map(u => (
+            {list.map(u => (
               <tr key={u.username} className="border-t border-white/10">
                 <td className="p-2">{u.username}</td>
                 <td className="p-2">${(u.balance||0).toFixed(2)}</td>
                 <td className="p-2">{u.isAdmin?t('admin.yes'):t('admin.no')}</td>
+                <td className="p-2">
+                  <div className="flex gap-2">
+                    <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={()=>setEditing(u)}>{t('admin.edit')}</button>
+                    <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={()=>handleToggle(u)}>{t('admin.toggleAdmin')}</button>
+                    <button className="px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light" onClick={()=>handleDelete(u)}>{t('admin.delete')}</button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+      {editing && (
+        <UserEditor
+          data={editing}
+          onClose={()=>setEditing(null)}
+          onSave={(d)=>{handleSave(editing.username, d); setEditing(null)}}
+        />
+      )}
+    </div>
+  )
+}
+
+function UserEditor({ data, onClose, onSave }) {
+  const { t } = useTranslation()
+  const [balance, setBalance] = useState(data.balance || 0)
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur flex items-center justify-center z-50 p-4">
+      <div className="glass rounded-2xl w-full max-w-sm p-6 space-y-3">
+        <div className="flex items-start justify-between">
+          <h3 className="text-xl font-semibold">{t('admin.editUser')}</h3>
+          <button onClick={onClose} className="text-white/60 hover:text-white">✕</button>
+        </div>
+        <label htmlFor="user-balance" className="sr-only">{t('admin.balance')}</label>
+        <input
+          id="user-balance"
+          type="number"
+          className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 w-full"
+          placeholder={t('admin.balance')}
+          aria-label={t('admin.balance')}
+          value={balance}
+          onChange={e=>setBalance(parseFloat(e.target.value||0))}
+        />
+        <div className="flex justify-end gap-2 pt-2">
+          <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={onClose}>{t('admin.cancel')}</button>
+          <button className="px-3 py-1.5 rounded-xl bg-blue hover:bg-blue-light" onClick={()=>onSave({ balance })}>{t('admin.save')}</button>
+        </div>
       </div>
     </div>
   )
