@@ -100,7 +100,7 @@ export function AuthProvider({ children }) {
 
   const getAllUsers = () => Object.values(loadUsers())
 
-    const getProfile = () => {
+  const getProfile = () => {
     if (!user) return null
     const users = loadUsers()
     return users[user.username]
@@ -113,8 +113,42 @@ export function AuthProvider({ children }) {
     saveUsers(users)
   }
 
+  const updateUser = (username, updates) => {
+    const users = loadUsers()
+    if (!users[username]) return
+    users[username] = { ...users[username], ...updates }
+    saveUsers(users)
+    if (user && user.username === username) {
+      const isAdmin = !!users[username].isAdmin
+      sessionStorage.setItem('rr_user', JSON.stringify({ username, isAdmin }))
+      setUser({ username, isAdmin })
+    }
+  }
+
+  const toggleAdmin = (username) => {
+    const users = loadUsers()
+    if (!users[username]) return
+    users[username].isAdmin = !users[username].isAdmin
+    saveUsers(users)
+    if (user && user.username === username) {
+      const isAdmin = !!users[username].isAdmin
+      sessionStorage.setItem('rr_user', JSON.stringify({ username, isAdmin }))
+      setUser({ username, isAdmin })
+    }
+  }
+
+  const deleteUser = (username) => {
+    const users = loadUsers()
+    if (!users[username]) return
+    delete users[username]
+    saveUsers(users)
+    if (user && user.username === username) {
+      logout()
+    }
+  }
+
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser }}>
       {children}
     </AuthCtx.Provider>
   )

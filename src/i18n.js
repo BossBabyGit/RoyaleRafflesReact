@@ -118,10 +118,10 @@ const resources = {
         manageRaffles: 'Manage Raffles',
         newRaffle: '+ New Raffle',
         edit: 'Edit',
-        endNow: 'End Now',
-        ended: 'Ended',
-        editRaffle: 'Edit Raffle',
-        newRaffleTitle: 'New Raffle',
+          endNow: 'End Now',
+          ended: 'Ended',
+          editRaffle: 'Edit Raffle',
+          newRaffleTitle: 'New Raffle',
         title: 'Title',
         imageUrl: 'Image URL',
         description: 'Description',
@@ -133,12 +133,18 @@ const resources = {
         save: 'Save',
         username: 'Username',
         balance: 'Balance',
-        admin: 'Admin',
-        yes: 'Yes',
-        no: 'No'
+          admin: 'Admin',
+          yes: 'Yes',
+          no: 'No',
+          actions: 'Actions',
+          toggleAdmin: 'Toggle Admin',
+          delete: 'Delete',
+          editUser: 'Edit User',
+          confirmDelete: 'Delete this user?',
+          confirmToggleAdmin: 'Toggle admin rights for this user?'
+        }
       }
-    }
-  },
+    },
   es: {
     translation: {
       header: {
@@ -270,13 +276,19 @@ const resources = {
         save: 'Guardar',
         username: 'Usuario',
         balance: 'Saldo',
-        admin: 'Admin',
-        yes: 'Sí',
-        no: 'No'
+          admin: 'Admin',
+          yes: 'Sí',
+          no: 'No',
+          actions: 'Acciones',
+          toggleAdmin: 'Cambiar admin',
+          delete: 'Eliminar',
+          editUser: 'Editar usuario',
+          confirmDelete: '¿Eliminar este usuario?',
+          confirmToggleAdmin: '¿Cambiar permisos de administrador?'
+        }
       }
     }
   }
-}
 
 i18n.use(initReactI18next).init({
   resources,
