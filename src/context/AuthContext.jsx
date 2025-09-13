@@ -67,10 +67,23 @@ export function AuthProvider({ children }) {
     if (users[username]) {
       return { ok: false, error: 'Username already exists' }
     }
-    users[username] = { username, password, balance: 100, entries: {}, wins: [], history: [], deposits: [], isAdmin:false }
+    const newUser = {
+      username,
+      password,
+      balance: 100,
+      entries: {},
+      wins: [],
+      history: [],
+      deposits: [],
+      isAdmin: false,
+    }
+    users[username] = newUser
     saveUsers(users)
-    sessionStorage.setItem('rr_user', JSON.stringify({ username, isAdmin: !!u.isAdmin }))
-    setUser({ username, isAdmin: !!u.isAdmin })
+    sessionStorage.setItem(
+      'rr_user',
+      JSON.stringify({ username, isAdmin: !!newUser.isAdmin })
+    )
+    setUser({ username, isAdmin: !!newUser.isAdmin })
     return { ok: true }
   }
 
