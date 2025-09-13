@@ -2,6 +2,7 @@
 import { useMemo, useState } from 'react'
 import { useRaffles } from '../context/RaffleContext'
 import RaffleCard from '../components/RaffleCard'
+import { useTranslation } from 'react-i18next'
 
 export default function Raffles() {
   const { raffles, purchase } = useRaffles()
@@ -9,6 +10,7 @@ export default function Raffles() {
   const [cat, setCat] = useState('All')
   const [status, setStatus] = useState('Active')
   const [sort, setSort] = useState('ending')
+  const { t } = useTranslation()
 
   const filtered = useMemo(() => {
     return raffles.filter(r => {
@@ -30,21 +32,21 @@ export default function Raffles() {
     <div className="py-8">
       <div className="glass rounded-2xl p-4 md:p-6">
         <div className="grid md:grid-cols-5 gap-3">
-          <input placeholder="Search raffles..." value={q} onChange={e=>setQ(e.target.value)}
+          <input placeholder={t('raffles.search')} value={q} onChange={e=>setQ(e.target.value)}
             className="md:col-span-2 bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none" />
           <select value={cat} onChange={e=>setCat(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2">
-            <option>All</option>
+            <option>{t('raffles.all')}</option>
             {cats.map(c=><option key={c}>{c}</option>)}
           </select>
           <select value={status} onChange={e=>setStatus(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2">
-            <option>Active</option>
-            <option>Ended</option>
-            <option>All</option>
+            <option>{t('raffles.active')}</option>
+            <option>{t('raffles.ended')}</option>
+            <option>{t('raffles.all')}</option>
           </select>
           <select value={sort} onChange={e=>setSort(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2">
-            <option value="ending">Ending Soon</option>
-            <option value="progress">Most Popular</option>
-            <option value="value">Prize Value</option>
+            <option value="ending">{t('raffles.endingSoon')}</option>
+            <option value="progress">{t('raffles.mostPopular')}</option>
+            <option value="value">{t('raffles.prizeValue')}</option>
           </select>
         </div>
       </div>

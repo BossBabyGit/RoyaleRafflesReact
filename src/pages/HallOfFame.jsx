@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useRaffles } from '../context/RaffleContext'
+import { useTranslation } from 'react-i18next'
 
 function maskUsername(name, currentUser) {
   if (currentUser && currentUser.username === name) return name
@@ -29,6 +30,7 @@ export default function HallOfFame() {
   const { user, getAllUsers } = useAuth()
   const { raffles } = useRaffles()
   const [season, setSeason] = useState('week') // week, month, all
+  const { t } = useTranslation()
 
   const stats = useMemo(() => {
     const days = season === 'week' ? 7 : season === 'month' ? 30 : null
@@ -74,7 +76,7 @@ export default function HallOfFame() {
   const medal = idx => idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : null
 
   const renderList = (list, formatter) => {
-    if (!list.length) return <div className="text-center py-6 text-white/60">No champions yet... be the first!</div>
+    if (!list.length) return <div className="text-center py-6 text-white/60">{t('hallOfFame.noChampions')}</div>
     const maxValue = list[0]?.value || 1
     return (
       <ul className="space-y-3">
@@ -104,26 +106,26 @@ export default function HallOfFame() {
   return (
     <div className="py-8">
       <section className="flex flex-col items-center justify-center text-center">
-        <h1 className="text-4xl md:text-6xl font-extrabold">Hall of Fame</h1>
-        <p className="text-white/70 mt-4 max-w-md">Celebrating our top raffle legends.</p>
+        <h1 className="text-4xl md:text-6xl font-extrabold">{t('hallOfFame.title')}</h1>
+        <p className="text-white/70 mt-4 max-w-md">{t('hallOfFame.tagline')}</p>
         <div className="mt-8 flex gap-3">
           <button onClick={() => setSeason('week')}
             className={`px-4 py-2 rounded-xl transition ${
               season==='week' ? 'bg-blue text-white' : 'bg-white/10 hover:bg-white/20'
             }`}>
-            Current Week
+            {t('hallOfFame.currentWeek')}
           </button>
           <button onClick={() => setSeason('month')}
             className={`px-4 py-2 rounded-xl transition ${
               season==='month' ? 'bg-blue text-white' : 'bg-white/10 hover:bg-white/20'
             }`}>
-            Current Month
+            {t('hallOfFame.currentMonth')}
           </button>
           <button onClick={() => setSeason('all')}
             className={`px-4 py-2 rounded-xl transition ${
               season==='all' ? 'bg-blue text-white' : 'bg-white/10 hover:bg-white/20'
             }`}>
-            All-Time
+            {t('hallOfFame.allTime')}
           </button>
         </div>
       </section>
@@ -137,7 +139,7 @@ export default function HallOfFame() {
               <div className="mt-2 font-semibold flex items-center gap-1">
                 {maskUsername(stats.mostTickets[0].username, user)} <span>🥇</span>
               </div>
-              <div className="text-sm text-white/60">Most Tickets</div>
+              <div className="text-sm text-white/60">{t('hallOfFame.championMostTickets')}</div>
             </div>
           )}
           {stats.mostWins[0] && (
@@ -146,7 +148,7 @@ export default function HallOfFame() {
               <div className="mt-2 font-semibold flex items-center gap-1">
                 {maskUsername(stats.mostWins[0].username, user)} <span>🥇</span>
               </div>
-              <div className="text-sm text-white/60">Most Wins</div>
+              <div className="text-sm text-white/60">{t('hallOfFame.championMostWins')}</div>
             </div>
           )}
           {stats.luckiest[0] && (
@@ -155,25 +157,25 @@ export default function HallOfFame() {
               <div className="mt-2 font-semibold flex items-center gap-1">
                 {maskUsername(stats.luckiest[0].username, user)} <span>🥇</span>
               </div>
-              <div className="text-sm text-white/60">Luckiest</div>
+              <div className="text-sm text-white/60">{t('hallOfFame.championLuckiest')}</div>
             </div>
           )}
         </section>
       ) : (
-        <div className="text-center text-white/60 mt-10">No champions yet... be the first!</div>
+        <div className="text-center text-white/60 mt-10">{t('hallOfFame.noChampions')}</div>
       )}
 
       <section className="mt-10 grid gap-6 md:grid-cols-3">
         <div className="glass rounded-2xl p-6 border border-white/10 shadow-glow">
-          <h3 className="font-semibold mb-4">🎟️ Most Tickets Bought</h3>
+          <h3 className="font-semibold mb-4">🎟️ {t('hallOfFame.mostTickets')}</h3>
           {renderList(stats.mostTickets, i => i.value)}
         </div>
         <div className="glass rounded-2xl p-6 border border-white/10 shadow-glow">
-          <h3 className="font-semibold mb-4">🏆 Most Wins</h3>
+          <h3 className="font-semibold mb-4">🏆 {t('hallOfFame.mostWins')}</h3>
           {renderList(stats.mostWins, i => i.value)}
         </div>
         <div className="glass rounded-2xl p-6 border border-white/10 shadow-glow">
-          <h3 className="font-semibold mb-4" title="Must have at least 5 tickets to qualify">🍀 Luckiest</h3>
+          <h3 className="font-semibold mb-4" title="Must have at least 5 tickets to qualify">🍀 {t('hallOfFame.luckiest')}</h3>
           {renderList(stats.luckiest, i => `${Math.round(i.value * 100)}%`)}
         </div>
       </section>
