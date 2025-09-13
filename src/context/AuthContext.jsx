@@ -10,23 +10,31 @@ const DEMO_USER = {
   entries: {}, // { raffleId: numberOfTickets }
   wins: [],
   history: [], // ended raffles entered
+  deposits: [],
 }
 
 function loadUsers() {
   const raw = localStorage.getItem('rr_users')
   let users = raw ? JSON.parse(raw) : {}
-  
-if (!users['demo']) {
 
-    
-users['demo'] = DEMO_USER
-users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], isAdmin:true }
-users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], isAdmin:false }
-users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], isAdmin:false }
-users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], isAdmin:false }
-
+  if (!users['demo']) {
+    users['demo'] = DEMO_USER
+    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], isAdmin:true }
+    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
+    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
+    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
     localStorage.setItem('rr_users', JSON.stringify(users))
   }
+
+  // ensure deposits array exists for all users
+  let changed = false
+  Object.values(users).forEach(u => {
+    if (!u.deposits) {
+      u.deposits = []
+      changed = true
+    }
+  })
+  if (changed) localStorage.setItem('rr_users', JSON.stringify(users))
   return users
 }
 
@@ -59,7 +67,7 @@ export function AuthProvider({ children }) {
     if (users[username]) {
       return { ok: false, error: 'Username already exists' }
     }
-    users[username] = { username, password, balance: 100, entries: {}, wins: [], history: [], isAdmin:false }
+    users[username] = { username, password, balance: 100, entries: {}, wins: [], history: [], deposits: [], isAdmin:false }
     saveUsers(users)
     sessionStorage.setItem('rr_user', JSON.stringify({ username, isAdmin: !!u.isAdmin }))
     setUser({ username, isAdmin: !!u.isAdmin })
