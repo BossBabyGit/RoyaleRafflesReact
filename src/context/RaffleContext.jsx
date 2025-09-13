@@ -105,6 +105,48 @@ export function RaffleProvider({ children }) {
     notify(`Purchased ${count} ticket(s) for ${r.title}`); log({ type:'purchase', raffleId: raffleId, count, user: prof.username }); return { ok: true }
   }
 
+  const claimFreeTicket = (raffleId) => {
+    const prof = getProfile()
+    if (!prof) { notify('Please login first.', 'error'); return { ok: false, error: 'Not logged in' } }
+
+    const r = raffles.find(x => x.id === raffleId)
+    if (!r) { notify('Raffle not found', 'error'); return { ok:false, error:'Raffle not found' } }
+    if (r.ended) { notify('This raffle has ended', 'error'); return { ok:false, error:'Raffle ended' } }
+
+    const available = r.totalTickets - r.sold
+    if (available <= 0) { notify('No tickets available', 'error'); return { ok:false, error:'No tickets available' } }
+
+    const userOwned = prof.entries[raffleId] || 0
+    const maxAllowed = Math.floor(r.totalTickets * 0.5)
+    if (userOwned >= maxAllowed) { notify(`Limit exceeded. You can own at most ${maxAllowed} tickets.`, 'error'); return { ok:false, error:'Limit exceeded' } }
+
+    const freeEntries = prof.freeEntries || {}
+    if (freeEntries[raffleId]) { notify('Free ticket already claimed', 'error'); return { ok:false, error:'Already claimed' } }
+
+    const updatedRaffles = raffles.map(x => {
+      if (x.id !== raffleId) return x
+      const newEntries = [...(x.entries || [])]
+      const idx = newEntries.findIndex(e => e.username === prof.username)
+      if (idx >= 0) newEntries[idx] = { ...newEntries[idx], count: newEntries[idx].count + 1 }
+      else newEntries.push({ username: prof.username, count: 1 })
+      return { ...x, sold: x.sold + 1, entries: newEntries }
+    })
+    setRaffles(updatedRaffles)
+    saveRaffles(updatedRaffles)
+
+    updateProfile(u => {
+      const entries = { ...(u.entries || {}) }
+      entries[raffleId] = (entries[raffleId] || 0) + 1
+      const fe = { ...(u.freeEntries || {}) }
+      fe[raffleId] = true
+      return { ...u, entries, freeEntries: fe }
+    })
+
+    notify(`Claimed a free ticket for ${r.title}`)
+    log({ type:'free_entry', raffleId, user: prof.username })
+    return { ok: true }
+  }
+
   const upsertRaffle = (raffle) => {
     setRaffles(curr => {
       let next
@@ -150,7 +192,7 @@ export function RaffleProvider({ children }) {
   }, [raffles])
 
   return (
-    <RaffleCtx.Provider value={{ raffles, setRaffles, purchase, upsertRaffle, endRaffleManually, topRaffles, categorized }}>
+    <RaffleCtx.Provider value={{ raffles, setRaffles, purchase, claimFreeTicket, upsertRaffle, endRaffleManually, topRaffles, categorized }}>
       {children}
     </RaffleCtx.Provider>
   )

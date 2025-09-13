@@ -1,7 +1,8 @@
 
 import { useMemo, useState } from 'react'
-  import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import BuyModal from './BuyModal'
+import { useRaffles } from '../context/RaffleContext'
 
 function Progress({ sold, total }) {
   const pct = Math.round((sold/total)*100)
@@ -14,6 +15,7 @@ function Progress({ sold, total }) {
 
 export default function RaffleCard({ r, onPurchase }) {
   const [open, setOpen] = useState(false)
+  const { claimFreeTicket } = useRaffles()
   const timeLeft = useMemo(() => {
     const ms = r.endsAt - Date.now()
     if (ms <= 0) return "Ended"
@@ -41,7 +43,21 @@ export default function RaffleCard({ r, onPurchase }) {
         </div>
         <div className="flex items-center justify-between">
           <span className="text-white/80 text-sm">Ticket: <b className="text-blue-light">${r.ticketPrice.toFixed(2)}</b></span>
-          <button disabled={r.ended} onClick={()=>setOpen(true)} className="px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light disabled:opacity-50 disabled:cursor-not-allowed">Enter</button>
+          <div className="flex gap-2">
+            <button disabled={r.ended} onClick={async ()=>{
+                const shareText = `I joined this raffle for free on Royale Raffles! ${window.location.origin}/raffles/${r.id}`
+                try {
+                  if (navigator.share) {
+                    await navigator.share({ title:r.title, text:shareText, url: window.location.origin + '/raffles/' + r.id })
+                  } else {
+                    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`
+                    window.open(url, '_blank')
+                  }
+                  claimFreeTicket(r.id)
+                } catch(e) {}
+              }} className="px-3 py-1.5 rounded-xl bg-blue-light hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-black">Free Ticket</button>
+            <button disabled={r.ended} onClick={()=>setOpen(true)} className="px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light disabled:opacity-50 disabled:cursor-not-allowed">Enter</button>
+          </div>
         </div>
       </div>
       {open && <BuyModal r={r} onClose={()=>setOpen(false)} onPurchase={onPurchase} />}
