@@ -30,7 +30,7 @@ function Countdown({ endsAt, ended }) {
 export default function RaffleDetails() {
   const { id } = useParams()
   const { raffles, purchase } = useRaffles()
-  const { user, getProfile } = useAuth()
+  const { user, getProfile, toggleFavorite, isFavorite } = useAuth()
   const nav = useNavigate()
 
   const r = useMemo(()=> raffles.find(x => String(x.id) === String(id)), [raffles, id])
@@ -49,6 +49,7 @@ export default function RaffleDetails() {
 
   const profile = user ? getProfile() : null
   const youHave = profile?.entries?.[r.id] || 0
+  const fav = isFavorite(r.id)
   const maxPerUser = Math.floor(r.totalTickets * 0.5)
   const available = r.totalTickets - r.sold
 
@@ -59,7 +60,14 @@ export default function RaffleDetails() {
           <img src={r.image} alt={r.title} className="w-full h-80 object-cover" />
         </div>
         <div className="glass rounded-2xl p-6 space-y-3">
-          <h1 className="text-3xl font-extrabold">{r.title}</h1>
+          <h1 className="text-3xl font-extrabold flex items-center gap-3">
+            {r.title}
+            {user && (
+              <button onClick={() => toggleFavorite(r.id)} className="text-2xl leading-none">
+                {fav ? '★' : '☆'}
+              </button>
+            )}
+          </h1>
           <p className="text-white/70">{r.description}</p>
           <div className="text-sm text-white/80">Estimated value: <b className="text-white">${r.value}</b></div>
           <div className="text-sm text-white/80">Ticket price: <b className="text-blue-light">${r.ticketPrice.toFixed(2)}</b></div>

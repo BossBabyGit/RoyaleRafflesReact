@@ -1,6 +1,7 @@
 
 import { useMemo, useState } from 'react'
-  import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import BuyModal from './BuyModal'
 
 function Progress({ sold, total }) {
@@ -14,6 +15,8 @@ function Progress({ sold, total }) {
 
 export default function RaffleCard({ r, onPurchase }) {
   const [open, setOpen] = useState(false)
+  const { user, toggleFavorite, isFavorite } = useAuth()
+  const fav = isFavorite(r.id)
   const timeLeft = useMemo(() => {
     const ms = r.endsAt - Date.now()
     if (ms <= 0) return "Ended"
@@ -28,7 +31,14 @@ export default function RaffleCard({ r, onPurchase }) {
       <div className="relative">
         <Link to={`/raffles/${r.id}`}><img src={r.image} alt={r.title} className="w-full h-48 object-cover hover:opacity-90 transition" /></Link>
         <div className="absolute top-3 left-3 px-2 py-1 rounded-lg text-xs bg-black/60 border border-white/10">{r.category}</div>
-        {r.ended && <div className="absolute top-3 right-3 px-2 py-1 rounded-lg text-xs bg-claret">Ended</div>}
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          {user && (
+            <button onClick={() => toggleFavorite(r.id)} className="text-xl leading-none">
+              {fav ? '★' : '☆'}
+            </button>
+          )}
+          {r.ended && <div className="px-2 py-1 rounded-lg text-xs bg-claret">Ended</div>}
+        </div>
       </div>
       <div className="p-4 space-y-2">
         <h3 className="text-lg font-semibold"><Link className="hover:underline" to={`/raffles/${r.id}`}>{r.title}</Link></h3>

@@ -11,6 +11,7 @@ const DEMO_USER = {
   wins: [],
   history: [], // ended raffles entered
   deposits: [],
+  favorites: [],
 }
 
 function loadUsers() {
@@ -19,18 +20,22 @@ function loadUsers() {
 
   if (!users['demo']) {
     users['demo'] = DEMO_USER
-    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], isAdmin:true }
-    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
-    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
-    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
+    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], favorites:[], isAdmin:true }
+    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], favorites:[], isAdmin:false }
+    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], favorites:[], isAdmin:false }
+    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], favorites:[], isAdmin:false }
     localStorage.setItem('rr_users', JSON.stringify(users))
   }
 
-  // ensure deposits array exists for all users
+  // ensure deposits & favorites arrays exist for all users
   let changed = false
   Object.values(users).forEach(u => {
     if (!u.deposits) {
       u.deposits = []
+      changed = true
+    }
+    if (!u.favorites) {
+      u.favorites = []
       changed = true
     }
   })
@@ -75,6 +80,7 @@ export function AuthProvider({ children }) {
       wins: [],
       history: [],
       deposits: [],
+      favorites: [],
       isAdmin: false,
     }
     users[username] = newUser
@@ -105,10 +111,26 @@ export function AuthProvider({ children }) {
     const users = loadUsers()
     users[user.username] = updater(users[user.username])
     saveUsers(users)
+    setUser(u => (u ? { ...u } : null))
+  }
+
+  const toggleFavorite = (raffleId) => {
+    if (!user) return
+    updateProfile(u => {
+      const favs = new Set(u.favorites || [])
+      if (favs.has(raffleId)) favs.delete(raffleId)
+      else favs.add(raffleId)
+      return { ...u, favorites: Array.from(favs) }
+    })
+  }
+
+  const isFavorite = (raffleId) => {
+    const prof = getProfile()
+    return prof?.favorites?.includes(raffleId)
   }
 
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, toggleFavorite, isFavorite }}>
       {children}
     </AuthCtx.Provider>
   )

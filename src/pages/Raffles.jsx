@@ -1,28 +1,33 @@
 
 import { useMemo, useState } from 'react'
 import { useRaffles } from '../context/RaffleContext'
+import { useAuth } from '../context/AuthContext'
 import RaffleCard from '../components/RaffleCard'
 
 export default function Raffles() {
   const { raffles, purchase } = useRaffles()
+  const { user, getProfile } = useAuth()
   const [q, setQ] = useState('')
   const [cat, setCat] = useState('All')
   const [status, setStatus] = useState('Active')
   const [sort, setSort] = useState('ending')
+  const [onlyFavs, setOnlyFavs] = useState(false)
+  const favorites = user ? (getProfile()?.favorites || []) : []
 
   const filtered = useMemo(() => {
     return raffles.filter(r => {
       const matchesQ = r.title.toLowerCase().includes(q.toLowerCase())
       const matchesCat = cat === 'All' || r.category === cat
       const matchesStatus = status === 'All' || (status==='Active' ? !r.ended : r.ended)
-      return matchesQ && matchesCat && matchesStatus
+      const matchesFav = !onlyFavs || favorites.includes(r.id)
+      return matchesQ && matchesCat && matchesStatus && matchesFav
     }).sort((a,b)=>{
       if (sort==='ending') return a.endsAt - b.endsAt
       if (sort==='progress') return (b.sold/b.totalTickets) - (a.sold/a.totalTickets)
       if (sort==='value') return b.value - a.value
       return 0
     })
-  }, [raffles, q, cat, status, sort])
+  }, [raffles, q, cat, status, sort, onlyFavs, favorites])
 
   const cats = Array.from(new Set(raffles.map(r=>r.category)))
 
@@ -47,6 +52,14 @@ export default function Raffles() {
             <option value="value">Prize Value</option>
           </select>
         </div>
+        {user && (
+          <div className="mt-3 text-sm">
+            <label className="inline-flex items-center gap-1">
+              <input type="checkbox" checked={onlyFavs} onChange={e=>setOnlyFavs(e.target.checked)} className="accent-blue-light" />
+              Favorites
+            </label>
+          </div>
+        )}
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">

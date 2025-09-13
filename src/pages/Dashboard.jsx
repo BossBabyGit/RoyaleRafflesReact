@@ -27,6 +27,10 @@ export default function Dashboard() {
     return raffles.filter(r => r.ended && r.winner === profile.username)
   }, [profile, raffles])
 
+  const myFavorites = useMemo(() => {
+    return raffles.filter(r => (profile.favorites || []).includes(r.id))
+  }, [profile, raffles])
+
   const openDeposit = () => {
     const a = parseFloat(amt || 0)
     if (a <= 0) return
@@ -60,6 +64,24 @@ export default function Dashboard() {
             </div>
           ))}
           {(!profile.deposits || profile.deposits.length === 0) && <div className="text-white/60">No deposits yet.</div>}
+        </div>
+      </section>
+
+      <section className="glass rounded-2xl p-6">
+        <h3 className="text-xl font-semibold">My Watchlist</h3>
+        <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {myFavorites.map(r => (
+            <div key={r.id} className="p-4 border border-white/10 rounded-xl bg-black/20">
+              <div className="flex items-center gap-3">
+                <img src={r.image} className="w-16 h-16 object-cover rounded-lg" />
+                <div>
+                  <div className="font-semibold">{r.title}</div>
+                  <div className="text-sm text-white/70">Value: <b>${r.value}</b></div>
+                </div>
+              </div>
+            </div>
+          ))}
+          {myFavorites.length===0 && <div className="text-white/60">No favorites yet.</div>}
         </div>
       </section>
 
