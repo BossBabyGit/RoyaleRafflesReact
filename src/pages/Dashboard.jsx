@@ -3,11 +3,13 @@ import { useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
+import DepositModal from '../components/DepositModal'
 
 export default function Dashboard() {
   const { getProfile, updateProfile } = useAuth()
   const { raffles } = useRaffles()
   const [amt, setAmt] = useState(10)
+  const [showDeposit, setShowDeposit] = useState(false)
   const { notify, log } = useNotify()
   const profile = getProfile()
 
@@ -25,10 +27,20 @@ export default function Dashboard() {
     return raffles.filter(r => r.ended && r.winner === profile.username)
   }, [profile, raffles])
 
-  const topup = () => {
+  const openDeposit = () => {
     const a = parseFloat(amt || 0)
     if (a <= 0) return
-    updateProfile(u => ({ ...u, balance: u.balance + a })); notify(`Added $${a.toFixed(2)} to your balance`); log({ type:'topup', user: profile.username, amount: a })
+    setShowDeposit(true)
+  }
+
+  const handleDepositSuccess = (a) => {
+    updateProfile(u => ({
+      ...u,
+      balance: u.balance + a,
+      deposits: [...(u.deposits || []), { id: Date.now(), amount: a, date: new Date().toISOString() }]
+    }))
+    notify(`Added $${a.toFixed(2)} to your balance`)
+    log({ type: 'topup', user: profile.username, amount: a })
   }
 
   return (
@@ -38,7 +50,16 @@ export default function Dashboard() {
         <div className="mt-2 text-white/80">Current Balance: <b className="text-blue-light">${profile.balance.toFixed(2)}</b></div>
         <div className="mt-3 flex items-center gap-2">
           <input type="number" min="1" value={amt} onChange={e=>setAmt(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"/>
-          <button onClick={topup} className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">Top up</button>
+          <button onClick={openDeposit} className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">Top up</button>
+        </div>
+        <div className="mt-4 space-y-1 text-sm text-white/70">
+          {(profile.deposits || []).map(d => (
+            <div key={d.id} className="flex justify-between border-b border-white/10 pb-1">
+              <span>{new Date(d.date).toLocaleString()}</span>
+              <span className="text-blue-light">${d.amount.toFixed(2)}</span>
+            </div>
+          ))}
+          {(!profile.deposits || profile.deposits.length === 0) && <div className="text-white/60">No deposits yet.</div>}
         </div>
       </section>
 
@@ -86,6 +107,13 @@ export default function Dashboard() {
           {myWins.length===0 && <div className="text-white/60">No wins yet. Good luck!</div>}
         </div>
       </section>
+      {showDeposit && (
+        <DepositModal
+          amount={parseFloat(amt)}
+          onClose={() => setShowDeposit(false)}
+          onSuccess={(a) => { handleDepositSuccess(a); setShowDeposit(false) }}
+        />
+      )}
     </div>
   )
 }
