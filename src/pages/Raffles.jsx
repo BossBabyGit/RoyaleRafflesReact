@@ -32,8 +32,15 @@ export default function Raffles() {
     <div className="py-8">
       <div className="glass rounded-2xl p-4 md:p-6">
         <div className="grid md:grid-cols-5 gap-3">
-          <input placeholder={t('raffles.search')} value={q} onChange={e=>setQ(e.target.value)}
-            className="md:col-span-2 bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none" />
+          <label htmlFor="raffle-search" className="sr-only">{t('raffles.search')}</label>
+          <input
+            id="raffle-search"
+            placeholder={t('raffles.search')}
+            aria-label={t('raffles.search')}
+            value={q}
+            onChange={e=>setQ(e.target.value)}
+            className="md:col-span-2 bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
+          />
           <select value={cat} onChange={e=>setCat(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2">
             <option>{t('raffles.all')}</option>
             {cats.map(c=><option key={c}>{c}</option>)}

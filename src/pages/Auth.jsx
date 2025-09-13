@@ -31,10 +31,25 @@ export default function Auth() {
         <h2 className="text-2xl font-bold">{mode==='login'?t('auth.login'):t('auth.register')}</h2>
         <p className="text-white/70 text-sm mt-1" dangerouslySetInnerHTML={{ __html: t('auth.demo') }} />
         <div className="space-y-3 mt-6">
-          <input placeholder={t('auth.username')} value={username} onChange={e=>setUsername(e.target.value)}
-            className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none" />
-          <input placeholder={t('auth.password')} type="password" value={password} onChange={e=>setPassword(e.target.value)}
-            className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none" />
+          <label htmlFor="auth-username" className="sr-only">{t('auth.username')}</label>
+          <input
+            id="auth-username"
+            placeholder={t('auth.username')}
+            aria-label={t('auth.username')}
+            value={username}
+            onChange={e=>setUsername(e.target.value)}
+            className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
+          />
+          <label htmlFor="auth-password" className="sr-only">{t('auth.password')}</label>
+          <input
+            id="auth-password"
+            placeholder={t('auth.password')}
+            aria-label={t('auth.password')}
+            type="password"
+            value={password}
+            onChange={e=>setPassword(e.target.value)}
+            className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
+          />
           {error && <div className="text-sm text-red-400">{error}</div>}
           <button onClick={handle} className="w-full px-4 py-2 rounded-2xl bg-blue hover:bg-blue-light">{mode==='login'?t('auth.login'):t('auth.createAccount')}</button>
           <button onClick={()=>{setMode(mode==='login'?'register':'login'); setError('')}} className="w-full px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20">

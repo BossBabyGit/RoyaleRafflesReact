@@ -70,14 +70,81 @@ function RaffleEditor({ data, onClose, onSave }) {
           <button onClick={onClose} className="text-white/60 hover:text-white">✕</button>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder={t('admin.title')} value={form.title} onChange={e=>set('title', e.target.value)} />
-          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder={t('admin.imageUrl')} value={form.image} onChange={e=>set('image', e.target.value)} />
-          <textarea className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder={t('admin.description')} value={form.description} onChange={e=>set('description', e.target.value)} />
-          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder={t('admin.value')} value={form.value} onChange={e=>set('value', parseFloat(e.target.value||0))} />
-          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder={t('admin.ticketPrice')} value={form.ticketPrice} onChange={e=>set('ticketPrice', parseFloat(e.target.value||0))} />
-          <input type="number" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2" placeholder={t('admin.totalTickets')} value={form.totalTickets} onChange={e=>set('totalTickets', parseInt(e.target.value||0,10))} />
-          <input type="datetime-local" className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" value={new Date(form.endsAt).toISOString().slice(0,16)} onChange={e=>set('endsAt', new Date(e.target.value).getTime())} />
-          <input className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2" placeholder={t('admin.category')} value={form.category||'General'} onChange={e=>set('category', e.target.value)} />
+          <label htmlFor="raffle-title" className="sr-only">{t('admin.title')}</label>
+          <input
+            id="raffle-title"
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2"
+            placeholder={t('admin.title')}
+            aria-label={t('admin.title')}
+            value={form.title}
+            onChange={e=>set('title', e.target.value)}
+          />
+          <label htmlFor="raffle-image" className="sr-only">{t('admin.imageUrl')}</label>
+          <input
+            id="raffle-image"
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2"
+            placeholder={t('admin.imageUrl')}
+            aria-label={t('admin.imageUrl')}
+            value={form.image}
+            onChange={e=>set('image', e.target.value)}
+          />
+          <label htmlFor="raffle-description" className="sr-only">{t('admin.description')}</label>
+          <textarea
+            id="raffle-description"
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2"
+            placeholder={t('admin.description')}
+            aria-label={t('admin.description')}
+            value={form.description}
+            onChange={e=>set('description', e.target.value)}
+          />
+          <label htmlFor="raffle-value" className="sr-only">{t('admin.value')}</label>
+          <input
+            id="raffle-value"
+            type="number"
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"
+            placeholder={t('admin.value')}
+            aria-label={t('admin.value')}
+            value={form.value}
+            onChange={e=>set('value', parseFloat(e.target.value||0))}
+          />
+          <label htmlFor="raffle-ticketPrice" className="sr-only">{t('admin.ticketPrice')}</label>
+          <input
+            id="raffle-ticketPrice"
+            type="number"
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"
+            placeholder={t('admin.ticketPrice')}
+            aria-label={t('admin.ticketPrice')}
+            value={form.ticketPrice}
+            onChange={e=>set('ticketPrice', parseFloat(e.target.value||0))}
+          />
+          <label htmlFor="raffle-totalTickets" className="sr-only">{t('admin.totalTickets')}</label>
+          <input
+            id="raffle-totalTickets"
+            type="number"
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"
+            placeholder={t('admin.totalTickets')}
+            aria-label={t('admin.totalTickets')}
+            value={form.totalTickets}
+            onChange={e=>set('totalTickets', parseInt(e.target.value||0,10))}
+          />
+          <label htmlFor="raffle-endsAt" className="sr-only">End Date</label>
+          <input
+            id="raffle-endsAt"
+            type="datetime-local"
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2"
+            value={new Date(form.endsAt).toISOString().slice(0,16)}
+            onChange={e=>set('endsAt', new Date(e.target.value).getTime())}
+            aria-label="End Date"
+          />
+          <label htmlFor="raffle-category" className="sr-only">{t('admin.category')}</label>
+          <input
+            id="raffle-category"
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2 col-span-2"
+            placeholder={t('admin.category')}
+            aria-label={t('admin.category')}
+            value={form.category||'General'}
+            onChange={e=>set('category', e.target.value)}
+          />
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={onClose}>{t('admin.cancel')}</button>
