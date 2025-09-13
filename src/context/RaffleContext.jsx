@@ -1,22 +1,22 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import seed from '../data/raffles'
-  import { useNotify } from './NotificationContext'
+import { useNotify } from './NotificationContext'
 import { useAuth } from './AuthContext'
 
 const RaffleCtx = createContext(null)
 
 const now = () => new Date().getTime()
 
-  function drawWinner(r) {
-    let winner = null
-    if (r.entries && r.entries.length > 0) {
-      const pool = r.entries.flatMap(e => Array(e.count).fill(e.username))
-      const idx = Math.floor(Math.random() * pool.length)
-      winner = pool[idx]
-    }
-    return winner
+function drawWinner(r) {
+  let winner = null
+  if (r.entries && r.entries.length > 0) {
+    const pool = r.entries.flatMap(e => Array(e.count).fill(e.username))
+    const idx = Math.floor(Math.random() * pool.length)
+    winner = pool[idx]
   }
+  return winner
+}
 
 function loadRaffles() {
   const raw = localStorage.getItem('rr_raffles')
@@ -105,6 +105,36 @@ export function RaffleProvider({ children }) {
     notify(`Purchased ${count} ticket(s) for ${r.title}`); log({ type:'purchase', raffleId: raffleId, count, user: prof.username }); return { ok: true }
   }
 
+  const upsertRaffle = (raffle) => {
+    setRaffles(curr => {
+      let next
+      if (raffle.id) {
+        next = curr.map(r => (r.id === raffle.id ? { ...r, ...raffle } : r))
+      } else {
+        const newId = curr.reduce((m, r) => Math.max(m, r.id), 0) + 1
+        const newRaffle = { ...raffle, id: newId, sold: 0, entries: [], ended: false, winner: null }
+        next = [...curr, newRaffle]
+      }
+      saveRaffles(next)
+      return next
+    })
+  }
+
+  const endRaffleManually = (id) => {
+    let ended = null
+    const updated = raffles.map(r => {
+      if (r.id !== id) return r
+      if (r.ended) return r
+      const winner = drawWinner(r)
+      const endedR = { ...r, ended: true, winner }
+      ended = endedR
+      return endedR
+    })
+    setRaffles(updated)
+    saveRaffles(updated)
+    if (ended?.winner) log({ type:'raffle_end', raffleId: ended.id, winner: ended.winner })
+  }
+
   const topRaffles = useMemo(() => {
     const active = raffles.filter(r => !r.ended)
     return [...active].sort((a,b) => (b.sold/b.totalTickets) - (a.sold/a.totalTickets)).slice(0,3)
@@ -120,7 +150,7 @@ export function RaffleProvider({ children }) {
   }, [raffles])
 
   return (
-    <RaffleCtx.Provider value={{ raffles, setRaffles, purchase, topRaffles, categorized }}>
+    <RaffleCtx.Provider value={{ raffles, setRaffles, purchase, upsertRaffle, endRaffleManually, topRaffles, categorized }}>
       {children}
     </RaffleCtx.Provider>
   )
