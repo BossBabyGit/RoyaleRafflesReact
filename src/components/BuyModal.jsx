@@ -32,8 +32,17 @@ export default function BuyModal({ r, onClose, onPurchase }) {
         </div>
         <p className="text-white/80 text-sm">How many tickets would you like to buy for <b>{r.title}</b>?</p>
         <div className="space-y-2">
-          <input type="number" min="1" max={Math.min(maxByCap, available)} value={count}
-            onChange={e=>setCount(e.target.value)} className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"/>
+          <label htmlFor="ticket-count" className="sr-only">Ticket count</label>
+          <input
+            id="ticket-count"
+            type="number"
+            min="1"
+            max={Math.min(maxByCap, available)}
+            value={count}
+            onChange={e=>setCount(e.target.value)}
+            className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
+            aria-label="Ticket count"
+          />
           <div className="text-xs text-white/70">Max per user: <b>{maxByCap}</b> • Available: <b>{available}</b></div>
           <div className="text-sm">Total: <b className="text-blue-light">${(r.ticketPrice * (parseInt(count||0,10)||0)).toFixed(2)}</b></div>
           {err && <div className="text-sm text-red-400">{err}</div>}

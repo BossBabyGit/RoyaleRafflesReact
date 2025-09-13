@@ -57,7 +57,16 @@ export default function Dashboard() {
         <h2 className="text-2xl font-bold">{t('dashboard.myWallet')}</h2>
         <div className="mt-2 text-white/80">{t('dashboard.currentBalance')} <b className="text-blue-light">${profile.balance.toFixed(2)}</b></div>
         <div className="mt-3 flex items-center gap-2">
-          <input type="number" min="1" value={amt} onChange={e=>setAmt(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"/>
+          <label htmlFor="deposit-amount" className="sr-only">Amount</label>
+          <input
+            id="deposit-amount"
+            type="number"
+            min="1"
+            value={amt}
+            onChange={e=>setAmt(e.target.value)}
+            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"
+            aria-label="Amount"
+          />
           <button onClick={openDeposit} className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">{t('dashboard.topUp')}</button>
         </div>
         <div className="mt-4 space-y-1 text-sm text-white/70">

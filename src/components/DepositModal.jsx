@@ -48,31 +48,47 @@ export default function DepositModal({ amount, onClose, onSuccess }) {
               </div>
               <div className="space-y-2">
                 <div className="text-sm text-white/70">Amount: <b className="text-blue-light">${amount.toFixed(2)}</b></div>
+                <label htmlFor="card-number" className="sr-only">Card Number</label>
                 <input
-                placeholder="Card Number"
-                value={card.number}
-                onChange={e => setCard({ ...card, number: e.target.value })}
-                className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
-              />
+                  id="card-number"
+                  placeholder="Card Number"
+                  value={card.number}
+                  onChange={e => setCard({ ...card, number: e.target.value })}
+                  className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
+                  aria-label="Card Number"
+                />
               <div className="flex gap-2">
-                <input
-                  placeholder="MM/YY"
-                  value={card.expiry}
-                  onChange={e => setCard({ ...card, expiry: e.target.value })}
-                  className="flex-1 bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
-                />
-                <input
-                  placeholder="CVC"
-                  value={card.cvc}
-                  onChange={e => setCard({ ...card, cvc: e.target.value })}
-                  className="flex-1 bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
-                />
+                <div className="flex-1">
+                  <label htmlFor="card-expiry" className="sr-only">Expiry date</label>
+                  <input
+                    id="card-expiry"
+                    placeholder="MM/YY"
+                    value={card.expiry}
+                    onChange={e => setCard({ ...card, expiry: e.target.value })}
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
+                    aria-label="Expiry date"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="card-cvc" className="sr-only">CVC</label>
+                  <input
+                    id="card-cvc"
+                    placeholder="CVC"
+                    value={card.cvc}
+                    onChange={e => setCard({ ...card, cvc: e.target.value })}
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
+                    aria-label="CVC"
+                  />
+                </div>
               </div>
+              <label htmlFor="card-name" className="sr-only">Name on Card</label>
               <input
+                id="card-name"
                 placeholder="Name on Card"
                 value={card.name}
                 onChange={e => setCard({ ...card, name: e.target.value })}
                 className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
+                aria-label="Name on Card"
               />
               {err && <div className="text-sm text-red-400">{err}</div>}
             </div>
