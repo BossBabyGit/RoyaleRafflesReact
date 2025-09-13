@@ -11,6 +11,7 @@ const DEMO_USER = {
   wins: [],
   history: [], // ended raffles entered
   deposits: [],
+  freeEntries: {},
 }
 
 function loadUsers() {
@@ -19,18 +20,22 @@ function loadUsers() {
 
   if (!users['demo']) {
     users['demo'] = DEMO_USER
-    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], isAdmin:true }
-    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
-    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
-    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], isAdmin:false }
+    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:true }
+    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false }
+    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false }
+    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false }
     localStorage.setItem('rr_users', JSON.stringify(users))
   }
 
-  // ensure deposits array exists for all users
+  // ensure required fields exist for all users
   let changed = false
   Object.values(users).forEach(u => {
     if (!u.deposits) {
       u.deposits = []
+      changed = true
+    }
+    if (!u.freeEntries) {
+      u.freeEntries = {}
       changed = true
     }
   })
@@ -75,6 +80,7 @@ export function AuthProvider({ children }) {
       wins: [],
       history: [],
       deposits: [],
+      freeEntries: {},
       isAdmin: false,
     }
     users[username] = newUser

@@ -30,7 +30,7 @@ function Countdown({ endsAt, ended }) {
 
 export default function RaffleDetails() {
   const { id } = useParams()
-  const { raffles, purchase } = useRaffles()
+  const { raffles, purchase, claimFreeTicket } = useRaffles()
   const { user, getProfile } = useAuth()
   const nav = useNavigate()
   const { t } = useTranslation()
@@ -53,6 +53,22 @@ export default function RaffleDetails() {
   const youHave = profile?.entries?.[r.id] || 0
   const maxPerUser = Math.floor(r.totalTickets * 0.5)
   const available = r.totalTickets - r.sold
+  const freeClaimed = profile?.freeEntries?.[r.id]
+
+  const handleShare = async () => {
+    const shareText = `I joined this raffle for free on Royale Raffles! ${window.location.origin}/raffles/${r.id}`
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: r.title, text: shareText, url: window.location.origin + '/raffles/' + r.id })
+      } else {
+        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`
+        window.open(url, '_blank')
+      }
+      claimFreeTicket(r.id)
+    } catch (e) {
+      // ignore cancelled share
+    }
+  }
 
   return (
     <div className="py-8 space-y-6">
@@ -70,8 +86,11 @@ export default function RaffleDetails() {
           {user && (
             <div className="text-sm text-white/80">{t('raffleDetails.yourTickets')} <b>{youHave}</b> • {t('raffleDetails.maxPerUser')} <b>{maxPerUser}</b></div>
           )}
-          <div className="pt-2 flex gap-3">
+          <div className="pt-2 flex gap-3 flex-wrap">
             <button onClick={()=>nav(-1)} className="px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20">{t('raffleDetails.back')}</button>
+            <button disabled={r.ended || available<=0 || freeClaimed} onClick={handleShare} className="px-4 py-2 rounded-2xl bg-blue-light hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-black">
+              {freeClaimed ? 'Free Ticket Claimed' : 'Share & Free Ticket'}
+            </button>
             <button disabled={r.ended || available<=0} onClick={()=>setOpen(true)} className="px-4 py-2 rounded-2xl bg-claret hover:bg-claret-light disabled:opacity-50 disabled:cursor-not-allowed">
               {r.ended ? t('raffleDetails.ended') : t('raffleDetails.enter')}
             </button>
