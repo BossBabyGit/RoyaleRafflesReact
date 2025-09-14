@@ -1,9 +1,14 @@
+import { Link } from 'react-router-dom'
+
 export default function Footer() {
   return (
     <footer className="mt-16 border-t border-white/10 bg-black/30">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 text-white/60 text-sm grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="space-y-4">
-          <img src={logo} alt="Royal Raffles logo" className="h-10 w-auto" />
+          <Link to="/" className="block text-2xl font-extrabold tracking-tight">
+            <span className="text-claret">Royale</span>
+            <span className="text-blue-light">Raffles</span>
+          </Link>
           <p className="text-white">UK prize competitions • 18+ only</p>
           <p className="text-xs">© {new Date().getFullYear()} RoyaleRaffles. All rights reserved.</p>
         </div>
