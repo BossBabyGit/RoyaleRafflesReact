@@ -8,6 +8,7 @@ import DepositModal from '../components/DepositModal'
 import { useTranslation } from 'react-i18next'
 import badges, { dailyChallenges, weeklyChallenges } from '../data/badges'
 import BadgeGallery from '../components/BadgeGallery'
+import EntryHistory from '../components/EntryHistory'
 
 export default function Dashboard() {
   const { getProfile, updateProfile } = useAuth()
@@ -182,6 +183,11 @@ export default function Dashboard() {
           ))}
           {myWins.length===0 && <div className="text-white/60">{t('dashboard.noWins')}</div>}
         </div>
+      </section>
+
+      <section className="glass rounded-2xl p-6">
+        <h3 className="text-xl font-semibold">Purchase History</h3>
+        <EntryHistory />
       </section>
       {showDeposit && (
         <DepositModal

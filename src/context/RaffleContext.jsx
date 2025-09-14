@@ -33,7 +33,7 @@ function saveRaffles(raffles) {
 export function RaffleProvider({ children }) {
     const { notify, log } = useNotify()
   const [raffles, setRaffles] = useState([])
-  const { user, getProfile, updateProfile } = useAuth()
+  const { user, getProfile, updateProfile, addHistory } = useAuth()
 
   useEffect(() => {
     setRaffles(loadRaffles())
@@ -101,6 +101,8 @@ export function RaffleProvider({ children }) {
       entries[raffleId] = (entries[raffleId] || 0) + count
       return { ...u, balance: u.balance - price, entries }
     })
+
+    addHistory(raffleId, r.title, count)
 
     notify(`Purchased ${count} ticket(s) for ${r.title}`); log({ type:'purchase', raffleId: raffleId, count, user: prof.username }); return { ok: true }
   }
