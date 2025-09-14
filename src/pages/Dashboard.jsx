@@ -1,5 +1,6 @@
 
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
@@ -53,6 +54,9 @@ export default function Dashboard() {
 
   return (
     <div className="py-8 space-y-8">
+      <div className="flex justify-end">
+        <Link to="/settings" className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">Settings</Link>
+      </div>
       <section className="glass rounded-2xl p-6">
         <h2 className="text-2xl font-bold">{t('dashboard.myWallet')}</h2>
         <div className="mt-2 text-white/80">{t('dashboard.currentBalance')} <b className="text-blue-light">${profile.balance.toFixed(2)}</b></div>

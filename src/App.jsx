@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Raffles from './pages/Raffles'
 import RaffleDetails from './pages/RaffleDetails'
 import Dashboard from './pages/Dashboard'
+import ProfileSettings from './pages/ProfileSettings'
 import Auth from './pages/Auth'
 import Admin from './pages/Admin'
 import HallOfFame from './pages/HallOfFame'
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/hall-of-fame" element={<HallOfFame />} />
           <Route path="/community-vote" element={<CommunityVote />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/settings" element={<PrivateRoute><ProfileSettings /></PrivateRoute>} />
           <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
