@@ -26,6 +26,8 @@ const DEMO_USER = {
   weeklyStreak: 0,
   lastLogin: null,
   lastWeek: null,
+  avatar: '',
+  email: '',
 }
 
 function loadUsers() {
@@ -34,10 +36,10 @@ function loadUsers() {
 
   if (!users['demo']) {
     users['demo'] = DEMO_USER
-    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:true }
-    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false }
-    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false }
-    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false }
+    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:true, avatar:'', email:'' }
+    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false, avatar:'', email:'' }
+    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false, avatar:'', email:'' }
+    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false, avatar:'', email:'' }
     localStorage.setItem('rr_users', JSON.stringify(users))
   }
 
@@ -70,6 +72,14 @@ function loadUsers() {
     }
     if (u.lastWeek === undefined) {
       u.lastWeek = null
+      changed = true
+    }
+    if (u.avatar === undefined) {
+      u.avatar = ''
+      changed = true
+    }
+    if (u.email === undefined) {
+      u.email = ''
       changed = true
     }
   })
@@ -137,6 +147,8 @@ export function AuthProvider({ children }) {
       weeklyStreak: 0,
       lastLogin: null,
       lastWeek: null,
+      avatar: '',
+      email: '',
     }
     users[username] = newUser
     saveUsers(users)
@@ -206,8 +218,20 @@ export function AuthProvider({ children }) {
     updateProfile(u => ({ ...u, xp: (u.xp || 0) + amount }))
   }
 
+  const updateAvatar = (avatar) => {
+    updateProfile(u => ({ ...u, avatar }))
+  }
+
+  const updateEmail = (email) => {
+    updateProfile(u => ({ ...u, email }))
+  }
+
+  const updatePassword = (password) => {
+    updateProfile(u => ({ ...u, password }))
+  }
+
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser, addXP }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser, addXP, updateAvatar, updateEmail, updatePassword }}>
       {children}
     </AuthCtx.Provider>
   )
