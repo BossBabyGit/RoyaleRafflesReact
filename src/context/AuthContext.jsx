@@ -28,6 +28,7 @@ const DEMO_USER = {
   lastWeek: null,
   avatar: '',
   email: '',
+  roles: [],
 }
 
 function loadUsers() {
@@ -36,10 +37,10 @@ function loadUsers() {
 
   if (!users['demo']) {
     users['demo'] = DEMO_USER
-    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:true, avatar:'', email:'' }
-    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false, avatar:'', email:'' }
-    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false, avatar:'', email:'' }
-    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, isAdmin:false, avatar:'', email:'' }
+    users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, roles:['admin'], avatar:'', email:'' }
+    users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, roles:[], avatar:'', email:'' }
+    users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, roles:[], avatar:'', email:'' }
+    users['charlie'] = { username:'charlie', password:'charlie', balance: 900, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, roles:[], avatar:'', email:'' }
     localStorage.setItem('rr_users', JSON.stringify(users))
   }
 
@@ -82,6 +83,11 @@ function loadUsers() {
       u.email = ''
       changed = true
     }
+    if (!u.roles) {
+      u.roles = []
+      if (u.isAdmin) u.roles.push('admin')
+      changed = true
+    }
   })
   if (changed) localStorage.setItem('rr_users', JSON.stringify(users))
   return users
@@ -96,8 +102,15 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const session = sessionStorage.getItem('rr_user')
-    if (session) setUser(JSON.parse(session))
-    else setUser(null)
+    if (session) {
+      const data = JSON.parse(session)
+      if (data.isAdmin !== undefined && !data.roles) {
+        data.roles = data.isAdmin ? ['admin'] : []
+        delete data.isAdmin
+        sessionStorage.setItem('rr_user', JSON.stringify(data))
+      }
+      setUser(data)
+    } else setUser(null)
   }, [])
 
   const login = (username, password) => {
@@ -120,8 +133,9 @@ export function AuthProvider({ children }) {
       }
       users[username] = u
       saveUsers(users)
-      sessionStorage.setItem('rr_user', JSON.stringify({ username, isAdmin: !!u.isAdmin }))
-      setUser({ username, isAdmin: !!u.isAdmin })
+      const roles = u.roles || []
+      sessionStorage.setItem('rr_user', JSON.stringify({ username, roles }))
+      setUser({ username, roles })
       return { ok: true }
     }
     return { ok: false, error: 'Invalid credentials' }
@@ -141,7 +155,7 @@ export function AuthProvider({ children }) {
       history: [],
       deposits: [],
       freeEntries: {},
-      isAdmin: false,
+      roles: [],
       xp: 0,
       dailyStreak: 0,
       weeklyStreak: 0,
@@ -154,9 +168,9 @@ export function AuthProvider({ children }) {
     saveUsers(users)
     sessionStorage.setItem(
       'rr_user',
-      JSON.stringify({ username, isAdmin: !!newUser.isAdmin })
+      JSON.stringify({ username, roles: newUser.roles })
     )
-    setUser({ username, isAdmin: !!newUser.isAdmin })
+    setUser({ username, roles: newUser.roles })
     return { ok: true }
   }
 
@@ -186,21 +200,26 @@ export function AuthProvider({ children }) {
     users[username] = { ...users[username], ...updates }
     saveUsers(users)
     if (user && user.username === username) {
-      const isAdmin = !!users[username].isAdmin
-      sessionStorage.setItem('rr_user', JSON.stringify({ username, isAdmin }))
-      setUser({ username, isAdmin })
+      const roles = users[username].roles || []
+      sessionStorage.setItem('rr_user', JSON.stringify({ username, roles }))
+      setUser({ username, roles })
     }
   }
 
   const toggleAdmin = (username) => {
     const users = loadUsers()
     if (!users[username]) return
-    users[username].isAdmin = !users[username].isAdmin
+    const roles = users[username].roles || []
+    if (roles.includes('admin')) {
+      users[username].roles = roles.filter(r => r !== 'admin')
+    } else {
+      users[username].roles = [...roles, 'admin']
+    }
     saveUsers(users)
     if (user && user.username === username) {
-      const isAdmin = !!users[username].isAdmin
-      sessionStorage.setItem('rr_user', JSON.stringify({ username, isAdmin }))
-      setUser({ username, isAdmin })
+      const newRoles = users[username].roles || []
+      sessionStorage.setItem('rr_user', JSON.stringify({ username, roles: newRoles }))
+      setUser({ username, roles: newRoles })
     }
   }
 
@@ -230,8 +249,12 @@ export function AuthProvider({ children }) {
     updateProfile(u => ({ ...u, password }))
   }
 
+  const hasRole = (role) => {
+    return !!user?.roles?.includes(role)
+  }
+
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser, addXP, updateAvatar, updateEmail, updatePassword }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser, addXP, updateAvatar, updateEmail, updatePassword, hasRole }}>
       {children}
     </AuthCtx.Provider>
   )

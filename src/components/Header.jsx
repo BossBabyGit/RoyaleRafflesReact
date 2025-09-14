@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 
 export default function Header() {
-  const { user, logout, getProfile } = useAuth()
+  const { user, logout, getProfile, hasRole } = useAuth()
   const nav = useNavigate()
   const balance = user ? getProfile()?.balance ?? 0 : 0
   const { t, i18n } = useTranslation()
@@ -21,7 +21,7 @@ export default function Header() {
           <NavLink to="/community-vote" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>{t('header.community')}</NavLink>
           <NavLink to="/hall-of-fame" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>{t('header.hall')}</NavLink>
           {user && <NavLink to="/dashboard" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>{t('header.account')}</NavLink>}
-          {user?.isAdmin && <NavLink to="/admin" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>{t('header.admin')}</NavLink>}
+            {hasRole('admin') && <NavLink to="/admin" className={({isActive})=>isActive?'text-blue-light':'text-white/80 hover:text-white'}>{t('header.admin')}</NavLink>}
         </nav>
         <div className="flex items-center gap-3">
           {user ? (
