@@ -1,6 +1,15 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
+function getWeekKey(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+  const day = d.getUTCDay() || 7
+  d.setUTCDate(d.getUTCDate() + 4 - day)
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+  const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7)
+  return d.getUTCFullYear() * 100 + weekNo
+}
+
 const AuthCtx = createContext(null)
 
 const DEMO_USER = {
@@ -12,6 +21,11 @@ const DEMO_USER = {
   history: [], // ended raffles entered
   deposits: [],
   freeEntries: {},
+  xp: 0,
+  dailyStreak: 0,
+  weeklyStreak: 0,
+  lastLogin: null,
+  lastWeek: null,
 }
 
 function loadUsers() {
@@ -38,6 +52,26 @@ function loadUsers() {
       u.freeEntries = {}
       changed = true
     }
+    if (u.xp === undefined) {
+      u.xp = 0
+      changed = true
+    }
+    if (u.dailyStreak === undefined) {
+      u.dailyStreak = 0
+      changed = true
+    }
+    if (u.weeklyStreak === undefined) {
+      u.weeklyStreak = 0
+      changed = true
+    }
+    if (u.lastLogin === undefined) {
+      u.lastLogin = null
+      changed = true
+    }
+    if (u.lastWeek === undefined) {
+      u.lastWeek = null
+      changed = true
+    }
   })
   if (changed) localStorage.setItem('rr_users', JSON.stringify(users))
   return users
@@ -60,6 +94,22 @@ export function AuthProvider({ children }) {
     const users = loadUsers()
     const u = users[username]
     if (u && u.password === password) {
+      const today = new Date()
+      const dayKey = today.toDateString()
+      if (u.lastLogin !== dayKey) {
+        const prev = u.lastLogin ? new Date(u.lastLogin) : null
+        const diff = prev ? Math.floor((today - prev) / 86400000) : null
+        u.dailyStreak = diff === 1 ? (u.dailyStreak || 0) + 1 : 1
+        u.lastLogin = dayKey
+      }
+      const wKey = getWeekKey(today)
+      if (u.lastWeek !== wKey) {
+        const diffW = u.lastWeek ? wKey - u.lastWeek : null
+        u.weeklyStreak = diffW === 1 ? (u.weeklyStreak || 0) + 1 : 1
+        u.lastWeek = wKey
+      }
+      users[username] = u
+      saveUsers(users)
       sessionStorage.setItem('rr_user', JSON.stringify({ username, isAdmin: !!u.isAdmin }))
       setUser({ username, isAdmin: !!u.isAdmin })
       return { ok: true }
@@ -82,6 +132,11 @@ export function AuthProvider({ children }) {
       deposits: [],
       freeEntries: {},
       isAdmin: false,
+      xp: 0,
+      dailyStreak: 0,
+      weeklyStreak: 0,
+      lastLogin: null,
+      lastWeek: null,
     }
     users[username] = newUser
     saveUsers(users)
@@ -147,8 +202,12 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const addXP = (amount) => {
+    updateProfile(u => ({ ...u, xp: (u.xp || 0) + amount }))
+  }
+
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser, addXP }}>
       {children}
     </AuthCtx.Provider>
   )

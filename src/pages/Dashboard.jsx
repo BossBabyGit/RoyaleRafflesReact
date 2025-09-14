@@ -5,7 +5,7 @@ import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
 import DepositModal from '../components/DepositModal'
 import { useTranslation } from 'react-i18next'
-import badges from '../data/badges'
+import badges, { dailyChallenges, weeklyChallenges } from '../data/badges'
 import BadgeGallery from '../components/BadgeGallery'
 
 export default function Dashboard() {
@@ -81,6 +81,59 @@ export default function Dashboard() {
       </section>
 
       <BadgeGallery earned={earnedBadges} username={profile.username} />
+
+      <section className="glass rounded-2xl p-6">
+        <h3 className="text-xl font-semibold mb-4">Progress</h3>
+        <div>
+          <div className="flex justify-between text-sm mb-1">
+            <span>XP</span>
+            <span>{profile.xp || 0}</span>
+          </div>
+          <div className="w-full bg-black/30 h-2 rounded">
+            <div className="bg-blue-light h-2 rounded" style={{ width: `${(profile.xp || 0) % 100}%` }} />
+          </div>
+        </div>
+        <div className="mt-4 flex gap-4 text-sm">
+          <div className="flex items-center gap-1">
+            <span>🔥</span>
+            <span>{profile.dailyStreak || 0}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>📆</span>
+            <span>{profile.weeklyStreak || 0}</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="glass rounded-2xl p-6">
+        <h3 className="text-xl font-semibold mb-4">Daily Challenges</h3>
+        {dailyChallenges.map((c) => (
+          <div key={c.id} className="mb-3">
+            <div className="flex justify-between text-sm">
+              <span>{c.description}</span>
+              <span>{c.xp} XP</span>
+            </div>
+            <div className="w-full bg-black/30 h-2 rounded">
+              <div className="bg-blue-light h-2 rounded w-0" />
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className="glass rounded-2xl p-6">
+        <h3 className="text-xl font-semibold mb-4">Weekly Challenges</h3>
+        {weeklyChallenges.map((c) => (
+          <div key={c.id} className="mb-3">
+            <div className="flex justify-between text-sm">
+              <span>{c.description}</span>
+              <span>{c.xp} XP</span>
+            </div>
+            <div className="w-full bg-black/30 h-2 rounded">
+              <div className="bg-blue-light h-2 rounded w-0" />
+            </div>
+          </div>
+        ))}
+      </section>
 
       <section className="glass rounded-2xl p-6">
         <h3 className="text-xl font-semibold">{t('dashboard.activeEntries')}</h3>
