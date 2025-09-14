@@ -1,6 +1,3 @@
-import { Link } from 'react-router-dom'
-import logo from '../assets/logo.png'
-
 export default function Footer() {
   return (
     <footer className="mt-16 border-t border-white/10 bg-black/30">
@@ -37,7 +34,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 text-center py-4 text-xs text-white/40">
-        Built with React, Vite & Tailwind
+        Built by RoyaleRaffles
       </div>
     </footer>
   )
