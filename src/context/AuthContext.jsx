@@ -194,6 +194,16 @@ export function AuthProvider({ children }) {
     saveUsers(users)
   }
 
+  const addHistory = (raffleId, title, count) => {
+    updateProfile(u => ({
+      ...u,
+      history: [
+        ...(u.history || []),
+        { id: Date.now(), raffleId, title, count, date: new Date().toISOString() }
+      ]
+    }))
+  }
+
   const updateUser = (username, updates) => {
     const users = loadUsers()
     if (!users[username]) return
@@ -254,7 +264,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser, addXP, updateAvatar, updateEmail, updatePassword, hasRole }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, getProfile, updateProfile, getAllUsers, updateUser, toggleAdmin, deleteUser, addXP, updateAvatar, updateEmail, updatePassword, hasRole, addHistory }}>
       {children}
     </AuthCtx.Provider>
   )
