@@ -7,13 +7,13 @@ import { useNotify } from '../context/NotificationContext'
 import { useTranslation } from 'react-i18next'
 
 export default function Admin() {
-  const { user, getAllUsers } = useAuth()
+  const { getAllUsers, hasRole } = useAuth()
   const { raffles, upsertRaffle, endRaffleManually } = useRaffles()
   const { notify } = useNotify()
   const [tab, setTab] = useState('raffles')
   const { t } = useTranslation()
 
-  if (!user || !user.isAdmin) return <Navigate to="/auth" replace />
+  if (!hasRole('admin')) return <Navigate to="/auth" replace />
 
   return (
     <div className="py-8 space-y-6">
@@ -206,7 +206,7 @@ function UsersAdmin({ users }) {
               <tr key={u.username} className="border-t border-white/10">
                 <td className="p-2">{u.username}</td>
                 <td className="p-2">${(u.balance||0).toFixed(2)}</td>
-                <td className="p-2">{u.isAdmin?t('admin.yes'):t('admin.no')}</td>
+                <td className="p-2">{u.roles?.includes('admin')?t('admin.yes'):t('admin.no')}</td>
                 <td className="p-2">
                   <div className="flex gap-2">
                     <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={()=>setEditing(u)}>{t('admin.edit')}</button>
