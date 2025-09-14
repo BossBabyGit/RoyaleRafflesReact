@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import seed from '../data/raffles'
 import { useNotify } from './NotificationContext'
 import { useAuth } from './AuthContext'
+import { useAudit } from './AuditContext'
 
 const RaffleCtx = createContext(null)
 
@@ -32,6 +33,7 @@ function saveRaffles(raffles) {
 
 export function RaffleProvider({ children }) {
     const { notify, log } = useNotify()
+  const { log: audit } = useAudit()
   const [raffles, setRaffles] = useState([])
   const { user, getProfile, updateProfile, addHistory } = useAuth()
 
@@ -152,14 +154,21 @@ export function RaffleProvider({ children }) {
   const upsertRaffle = (raffle) => {
     setRaffles(curr => {
       let next
+      let action
+      let target
       if (raffle.id) {
         next = curr.map(r => (r.id === raffle.id ? { ...r, ...raffle } : r))
+        action = 'update_raffle'
+        target = raffle.id
       } else {
         const newId = curr.reduce((m, r) => Math.max(m, r.id), 0) + 1
         const newRaffle = { ...raffle, id: newId, sold: 0, entries: [], ended: false, winner: null }
         next = [...curr, newRaffle]
+        action = 'create_raffle'
+        target = newId
       }
       saveRaffles(next)
+      audit({ type: action, target, user: user?.username })
       return next
     })
   }
@@ -177,6 +186,7 @@ export function RaffleProvider({ children }) {
     setRaffles(updated)
     saveRaffles(updated)
     if (ended?.winner) log({ type:'raffle_end', raffleId: ended.id, winner: ended.winner })
+    audit({ type: 'end_raffle', target: id, user: user?.username })
   }
 
   const topRaffles = useMemo(() => {

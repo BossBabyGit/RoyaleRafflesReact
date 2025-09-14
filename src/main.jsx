@@ -10,20 +10,23 @@ import { AuthProvider } from './context/AuthContext'
 import { RaffleProvider } from './context/RaffleContext'
 import { NotificationProvider } from './context/NotificationContext'
 import { ChatProvider } from './context/ChatContext'
+import { AuditProvider } from './context/AuditContext'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <I18nextProvider i18n={i18n}>
       <BrowserRouter>
-        <AuthProvider>
-          <NotificationProvider>
-            <RaffleProvider>
-              <ChatProvider>
-                <App />
-              </ChatProvider>
-            </RaffleProvider>
-          </NotificationProvider>
-        </AuthProvider>
+        <AuditProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <RaffleProvider>
+                <ChatProvider>
+                  <App />
+                </ChatProvider>
+              </RaffleProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </AuditProvider>
       </BrowserRouter>
     </I18nextProvider>
   </React.StrictMode>

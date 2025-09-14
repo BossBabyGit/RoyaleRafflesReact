@@ -4,12 +4,14 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
+import { useAudit } from '../context/AuditContext'
 import { useTranslation } from 'react-i18next'
 
 export default function Admin() {
   const { getAllUsers, hasRole } = useAuth()
   const { raffles, upsertRaffle, endRaffleManually } = useRaffles()
   const { notify } = useNotify()
+  const { logs } = useAudit()
   const [tab, setTab] = useState('raffles')
   const { t } = useTranslation()
 
@@ -21,10 +23,12 @@ export default function Admin() {
         <button className={"px-3 py-1.5 rounded-xl " + (tab==='raffles'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('raffles')}>{t('admin.raffles')}</button>
         <button className={"px-3 py-1.5 rounded-xl " + (tab==='users'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('users')}>{t('admin.users')}</button>
         <button className={"px-3 py-1.5 rounded-xl " + (tab==='analytics'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('analytics')}>{t('admin.analytics')}</button>
+        <button className={"px-3 py-1.5 rounded-xl " + (tab==='activity'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('activity')}>{t('admin.activity')}</button>
       </div>
       {tab==='raffles' && <RafflesAdmin raffles={raffles} onSave={(r)=>{upsertRaffle(r); notify('Raffle saved')}} onEnd={(id)=>{endRaffleManually(id); notify('Raffle ended')}} />}
       {tab==='users' && <UsersAdmin users={getAllUsers()} />}
       {tab==='analytics' && <AnalyticsAdmin raffles={raffles} users={getAllUsers()} />}
+      {tab==='activity' && <ActivityLog logs={logs} />}
     </div>
   )
 }
@@ -454,6 +458,40 @@ function StatCard({ title, value }) {
     <div className="p-4 rounded-2xl bg-black/20 border border-white/10">
       <div className="text-white/70 text-sm">{title}</div>
       <div className="text-2xl font-bold mt-1">{value}</div>
+    </div>
+  )
+}
+
+function ActivityLog({ logs = [] }) {
+  const { t } = useTranslation()
+  const [type, setType] = useState('all')
+  const types = Array.from(new Set(logs.map(l => l.type)))
+  const filtered = type === 'all' ? logs : logs.filter(l => l.type === type)
+
+  return (
+    <div className="glass rounded-2xl p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-semibold">{t('admin.activity')}</h3>
+        <select
+          className="bg-black/30 border border-white/10 rounded-xl px-3 py-1.5"
+          value={type}
+          onChange={e => setType(e.target.value)}
+        >
+          <option value="all">{t('admin.allActions')}</option>
+          {types.map(t => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+      </div>
+      <div className="space-y-2 max-h-80 overflow-auto">
+        {filtered.map(l => (
+          <div key={l.id} className="p-2 rounded-xl bg-black/20 border border-white/10 text-sm">
+            <div><b>{l.type}</b> {l.target && <span className="text-white/80">({l.target})</span>}</div>
+            <div className="text-white/60">{new Date(l.timestamp).toLocaleString()} • {l.user}</div>
+          </div>
+        ))}
+        {filtered.length === 0 && <div className="text-white/60 text-sm">{t('admin.noActivity')}</div>}
+      </div>
     </div>
   )
 }

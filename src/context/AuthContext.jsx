@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useAudit } from './AuditContext'
 
 function getWeekKey(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
@@ -98,6 +99,7 @@ function saveUsers(users) {
 }
 
 export function AuthProvider({ children }) {
+  const { log: audit } = useAudit()
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -214,6 +216,7 @@ export function AuthProvider({ children }) {
       sessionStorage.setItem('rr_user', JSON.stringify({ username, roles }))
       setUser({ username, roles })
     }
+    audit({ type: 'update_user', target: username, user: user?.username })
   }
 
   const toggleAdmin = (username) => {
@@ -231,6 +234,7 @@ export function AuthProvider({ children }) {
       sessionStorage.setItem('rr_user', JSON.stringify({ username, roles: newRoles }))
       setUser({ username, roles: newRoles })
     }
+    audit({ type: 'toggle_admin', target: username, user: user?.username })
   }
 
   const deleteUser = (username) => {
@@ -238,6 +242,7 @@ export function AuthProvider({ children }) {
     if (!users[username]) return
     delete users[username]
     saveUsers(users)
+    audit({ type: 'delete_user', target: username, user: user?.username })
     if (user && user.username === username) {
       logout()
     }
