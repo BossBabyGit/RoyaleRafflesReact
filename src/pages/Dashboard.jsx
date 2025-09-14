@@ -58,87 +58,91 @@ export default function Dashboard() {
       <div className="flex justify-end">
         <Link to="/settings" className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">Settings</Link>
       </div>
-      <section className="glass rounded-2xl p-6">
-        <h2 className="text-2xl font-bold">{t('dashboard.myWallet')}</h2>
-        <div className="mt-2 text-white/80">{t('dashboard.currentBalance')} <b className="text-blue-light">${profile.balance.toFixed(2)}</b></div>
-        <div className="mt-3 flex items-center gap-2">
-          <label htmlFor="deposit-amount" className="sr-only">Amount</label>
-          <input
-            id="deposit-amount"
-            type="number"
-            min="1"
-            value={amt}
-            onChange={e=>setAmt(e.target.value)}
-            className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"
-            aria-label="Amount"
-          />
-          <button onClick={openDeposit} className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">{t('dashboard.topUp')}</button>
-        </div>
-        <div className="mt-4 space-y-1 text-sm text-white/70">
-          {(profile.deposits || []).map(d => (
-            <div key={d.id} className="flex justify-between border-b border-white/10 pb-1">
-              <span>{new Date(d.date).toLocaleString()}</span>
-              <span className="text-blue-light">${d.amount.toFixed(2)}</span>
+      <div className="grid gap-8 md:grid-cols-2">
+        <section className="glass rounded-2xl p-6">
+          <h2 className="text-2xl font-bold">{t('dashboard.myWallet')}</h2>
+          <div className="mt-2 text-white/80">{t('dashboard.currentBalance')} <b className="text-blue-light">${profile.balance.toFixed(2)}</b></div>
+          <div className="mt-3 flex items-center gap-2">
+            <label htmlFor="deposit-amount" className="sr-only">Amount</label>
+            <input
+              id="deposit-amount"
+              type="number"
+              min="1"
+              value={amt}
+              onChange={e=>setAmt(e.target.value)}
+              className="bg-black/30 border border-white/10 rounded-xl px-3 py-2"
+              aria-label="Amount"
+            />
+            <button onClick={openDeposit} className="px-4 py-2 rounded-xl bg-blue hover:bg-blue-light">{t('dashboard.topUp')}</button>
+          </div>
+          <div className="mt-4 space-y-1 text-sm text-white/70">
+            {(profile.deposits || []).map(d => (
+              <div key={d.id} className="flex justify-between border-b border-white/10 pb-1">
+                <span>{new Date(d.date).toLocaleString()}</span>
+                <span className="text-blue-light">${d.amount.toFixed(2)}</span>
+              </div>
+            ))}
+            {(!profile.deposits || profile.deposits.length === 0) && <div className="text-white/60">{t('dashboard.noDeposits')}</div>}
+          </div>
+        </section>
+
+        <BadgeGallery earned={earnedBadges} username={profile.username} />
+      </div>
+
+      <div className="grid gap-8 md:grid-cols-3">
+        <section className="glass rounded-2xl p-6">
+          <h3 className="text-xl font-semibold mb-4">Progress</h3>
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <span>XP</span>
+              <span>{profile.xp || 0}</span>
+            </div>
+            <div className="w-full bg-black/30 h-2 rounded">
+              <div className="bg-blue-light h-2 rounded" style={{ width: `${(profile.xp || 0) % 100}%` }} />
+            </div>
+          </div>
+          <div className="mt-4 flex gap-4 text-sm">
+            <div className="flex items-center gap-1">
+              <span>🔥</span>
+              <span>{profile.dailyStreak || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>📆</span>
+              <span>{profile.weeklyStreak || 0}</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="glass rounded-2xl p-6">
+          <h3 className="text-xl font-semibold mb-4">Daily Challenges</h3>
+          {dailyChallenges.map((c) => (
+            <div key={c.id} className="mb-3">
+              <div className="flex justify-between text-sm">
+                <span>{c.description}</span>
+                <span>{c.xp} XP</span>
+              </div>
+              <div className="w-full bg-black/30 h-2 rounded">
+                <div className="bg-blue-light h-2 rounded w-0" />
+              </div>
             </div>
           ))}
-          {(!profile.deposits || profile.deposits.length === 0) && <div className="text-white/60">{t('dashboard.noDeposits')}</div>}
-        </div>
-      </section>
+        </section>
 
-      <BadgeGallery earned={earnedBadges} username={profile.username} />
-
-      <section className="glass rounded-2xl p-6">
-        <h3 className="text-xl font-semibold mb-4">Progress</h3>
-        <div>
-          <div className="flex justify-between text-sm mb-1">
-            <span>XP</span>
-            <span>{profile.xp || 0}</span>
-          </div>
-          <div className="w-full bg-black/30 h-2 rounded">
-            <div className="bg-blue-light h-2 rounded" style={{ width: `${(profile.xp || 0) % 100}%` }} />
-          </div>
-        </div>
-        <div className="mt-4 flex gap-4 text-sm">
-          <div className="flex items-center gap-1">
-            <span>🔥</span>
-            <span>{profile.dailyStreak || 0}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span>📆</span>
-            <span>{profile.weeklyStreak || 0}</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="glass rounded-2xl p-6">
-        <h3 className="text-xl font-semibold mb-4">Daily Challenges</h3>
-        {dailyChallenges.map((c) => (
-          <div key={c.id} className="mb-3">
-            <div className="flex justify-between text-sm">
-              <span>{c.description}</span>
-              <span>{c.xp} XP</span>
+        <section className="glass rounded-2xl p-6">
+          <h3 className="text-xl font-semibold mb-4">Weekly Challenges</h3>
+          {weeklyChallenges.map((c) => (
+            <div key={c.id} className="mb-3">
+              <div className="flex justify-between text-sm">
+                <span>{c.description}</span>
+                <span>{c.xp} XP</span>
+              </div>
+              <div className="w-full bg-black/30 h-2 rounded">
+                <div className="bg-blue-light h-2 rounded w-0" />
+              </div>
             </div>
-            <div className="w-full bg-black/30 h-2 rounded">
-              <div className="bg-blue-light h-2 rounded w-0" />
-            </div>
-          </div>
-        ))}
-      </section>
-
-      <section className="glass rounded-2xl p-6">
-        <h3 className="text-xl font-semibold mb-4">Weekly Challenges</h3>
-        {weeklyChallenges.map((c) => (
-          <div key={c.id} className="mb-3">
-            <div className="flex justify-between text-sm">
-              <span>{c.description}</span>
-              <span>{c.xp} XP</span>
-            </div>
-            <div className="w-full bg-black/30 h-2 rounded">
-              <div className="bg-blue-light h-2 rounded w-0" />
-            </div>
-          </div>
-        ))}
-      </section>
+          ))}
+        </section>
+      </div>
 
       <section className="glass rounded-2xl p-6">
         <h3 className="text-xl font-semibold">{t('dashboard.activeEntries')}</h3>
