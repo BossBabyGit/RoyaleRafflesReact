@@ -22,6 +22,8 @@ export default function seed() {
       ],
       ended: false,
       winner: null,
+      createdAt: now - oneDay * 5,
+      sales: [{ timestamp: now - oneDay * 4, count: 34, revenue: 34 * 5 }],
     },
     {
       id: 2,
@@ -41,6 +43,8 @@ export default function seed() {
       ],
       ended: false,
       winner: null,
+      createdAt: now - oneDay * 4,
+      sales: [{ timestamp: now - oneDay * 3, count: 120, revenue: 120 * 3 }],
     },
     {
       id: 3,
@@ -60,6 +64,8 @@ export default function seed() {
       ],
       ended: false,
       winner: null,
+      createdAt: now - oneDay * 3,
+      sales: [{ timestamp: now - oneDay * 2, count: 75, revenue: 75 * 7 }],
     },
     {
       id: 4,
@@ -79,6 +85,8 @@ export default function seed() {
       ],
       ended: false,
       winner: null,
+      createdAt: now - oneDay * 2,
+      sales: [{ timestamp: now - oneDay * 1, count: 30, revenue: 30 * 2 }],
     },
     {
       id: 5,
@@ -98,6 +106,8 @@ export default function seed() {
       ],
       ended: false,
       winner: null,
+      createdAt: now - oneDay,
+      sales: [{ timestamp: now - oneDay * 0.5, count: 50, revenue: 50 * 4 }],
     }
   ]
 }
