@@ -6,6 +6,19 @@ import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
 import { useAudit } from '../context/AuditContext'
 import { useTranslation } from 'react-i18next'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Line, Bar } from 'react-chartjs-2'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend)
 
 export default function Admin() {
   const { getAllUsers, hasRole } = useAuth()
@@ -331,6 +344,54 @@ function AnalyticsAdmin({ raffles, users = [] }) {
   const avgTicketsPerUserOverall = totalUsers > 0 ? (totalTicketsByUsers / totalUsers) : 0
   const avgTicketsPerBuyer       = buyersCount > 0 ? (totalTicketsByUsers / buyersCount) : 0
 
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+
+  const sales = useMemo(() => raffles.flatMap(r => r.sales || []), [raffles])
+
+  const filteredSales = useMemo(() => {
+    const start = startDate ? new Date(startDate).getTime() : -Infinity
+    const end = endDate ? new Date(endDate).getTime() : Infinity
+    return sales.filter(s => s.timestamp >= start && s.timestamp <= end)
+  }, [sales, startDate, endDate])
+
+  const salesByDay = useMemo(() => {
+    const m = {}
+    filteredSales.forEach(s => {
+      const day = new Date(s.timestamp).toISOString().slice(0,10)
+      if (!m[day]) m[day] = { tickets: 0, revenue: 0 }
+      m[day].tickets += s.count
+      m[day].revenue += s.revenue
+    })
+    const labels = Object.keys(m).sort()
+    return {
+      labels,
+      tickets: labels.map(d => m[d].tickets),
+      revenue: labels.map(d => m[d].revenue),
+      rows: labels.map(d => ({ date: d, tickets: m[d].tickets, revenue: m[d].revenue })),
+    }
+  }, [filteredSales])
+
+  const chartOptions = { responsive: true, plugins: { legend: { display: false } } }
+
+  const exportData = salesByDay.rows
+  const exportCSV = () => {
+    const header = 'date,tickets,revenue\n'
+    const rows = exportData.map(r => `${r.date},${r.tickets},${r.revenue}`).join('\n')
+    const blob = new Blob([header + rows], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = 'metrics.csv'; a.click()
+    URL.revokeObjectURL(url)
+  }
+  const exportJSON = () => {
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = 'metrics.json'; a.click()
+    URL.revokeObjectURL(url)
+  }
+
   // --- Simple bar components (no external libs) ---
   const BarPair = ({ aLabel, aValue, bLabel, bValue, format = v => v }) => {
     const max = Math.max(aValue, bValue, 1)
@@ -385,6 +446,19 @@ function AnalyticsAdmin({ raffles, users = [] }) {
     <div className="glass rounded-2xl p-6 space-y-6">
       <h3 className="text-xl font-semibold">Analytics</h3>
 
+      <div className="flex flex-wrap items-end gap-2">
+        <div>
+          <label className="block text-xs text-white/60">Start</label>
+          <input type="date" className="bg-black/30 border border-white/10 rounded-xl px-2 py-1.5" value={startDate} onChange={e=>setStartDate(e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-xs text-white/60">End</label>
+          <input type="date" className="bg-black/30 border border-white/10 rounded-xl px-2 py-1.5" value={endDate} onChange={e=>setEndDate(e.target.value)} />
+        </div>
+        <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={exportCSV}>Export CSV</button>
+        <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={exportJSON}>Export JSON</button>
+      </div>
+
       {/* KPI Cards */}
       <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
         <StatCard title="Tickets Sold" value={totalTickets} />
@@ -396,6 +470,20 @@ function AnalyticsAdmin({ raffles, users = [] }) {
         <StatCard title="Avg Tickets / Buyer" value={avgTicketsPerBuyer.toFixed(2)} />
         <StatCard title="Active Raffles" value={activeRaffles} />
         <StatCard title="Ended Raffles" value={endedRaffles} />
+      </div>
+
+      {/* Sales & Revenue Charts */}
+      <div className="p-4 rounded-2xl bg-black/20 border border-white/10">
+        <h4 className="font-semibold mb-2">Ticket Sales Over Time</h4>
+        <div className="h-64">
+          <Line data={{ labels: salesByDay.labels, datasets: [{ label: 'Tickets Sold', data: salesByDay.tickets, borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.4 }] }} options={chartOptions} />
+        </div>
+      </div>
+      <div className="p-4 rounded-2xl bg-black/20 border border-white/10">
+        <h4 className="font-semibold mb-2">Revenue Over Time</h4>
+        <div className="h-64">
+          <Bar data={{ labels: salesByDay.labels, datasets: [{ label: 'Revenue', data: salesByDay.revenue, backgroundColor: '#a855f7' }] }} options={chartOptions} />
+        </div>
       </div>
 
       {/* Revenue vs Cost */}

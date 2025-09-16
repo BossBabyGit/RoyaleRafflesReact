@@ -19,10 +19,14 @@ function drawWinner(r) {
   return winner
 }
 
+function ensureFields(r) {
+  return { ...r, createdAt: r.createdAt || now(), sales: r.sales || [] }
+}
+
 function loadRaffles() {
   const raw = localStorage.getItem('rr_raffles')
-  if (raw) return JSON.parse(raw)
-  const seeded = seed()
+  if (raw) return JSON.parse(raw).map(ensureFields)
+  const seeded = seed().map(ensureFields)
   localStorage.setItem('rr_raffles', JSON.stringify(seeded))
   return seeded
 }
@@ -85,6 +89,7 @@ export function RaffleProvider({ children }) {
     if (r.sold + count > r.totalTickets) return { ok: false, error: 'Not enough tickets available' }
 
     // Update raffle
+    const sale = { timestamp: now(), count, revenue: price }
     const updatedRaffles = raffles.map(x => {
       if (x.id !== raffleId) return x
       const newEntries = [...(x.entries || [])]
@@ -92,7 +97,7 @@ export function RaffleProvider({ children }) {
       if (idx >= 0) newEntries[idx] = { ...newEntries[idx], count: newEntries[idx].count + count }
       else newEntries.push({ username: prof.username, count })
 
-      return { ...x, sold: x.sold + count, entries: newEntries }
+      return { ...x, sold: x.sold + count, entries: newEntries, sales: [ ...(x.sales || []), sale ] }
     })
     setRaffles(updatedRaffles)
     saveRaffles(updatedRaffles)
@@ -127,14 +132,15 @@ export function RaffleProvider({ children }) {
     const freeEntries = prof.freeEntries || {}
     if (freeEntries[raffleId]) { notify('Free ticket already claimed', 'error'); return { ok:false, error:'Already claimed' } }
 
-    const updatedRaffles = raffles.map(x => {
-      if (x.id !== raffleId) return x
-      const newEntries = [...(x.entries || [])]
-      const idx = newEntries.findIndex(e => e.username === prof.username)
-      if (idx >= 0) newEntries[idx] = { ...newEntries[idx], count: newEntries[idx].count + 1 }
-      else newEntries.push({ username: prof.username, count: 1 })
-      return { ...x, sold: x.sold + 1, entries: newEntries }
-    })
+      const sale = { timestamp: now(), count: 1, revenue: 0 }
+      const updatedRaffles = raffles.map(x => {
+        if (x.id !== raffleId) return x
+        const newEntries = [...(x.entries || [])]
+        const idx = newEntries.findIndex(e => e.username === prof.username)
+        if (idx >= 0) newEntries[idx] = { ...newEntries[idx], count: newEntries[idx].count + 1 }
+        else newEntries.push({ username: prof.username, count: 1 })
+        return { ...x, sold: x.sold + 1, entries: newEntries, sales: [ ...(x.sales || []), sale ] }
+      })
     setRaffles(updatedRaffles)
     saveRaffles(updatedRaffles)
 
@@ -162,7 +168,7 @@ export function RaffleProvider({ children }) {
         target = raffle.id
       } else {
         const newId = curr.reduce((m, r) => Math.max(m, r.id), 0) + 1
-        const newRaffle = { ...raffle, id: newId, sold: 0, entries: [], ended: false, winner: null }
+          const newRaffle = { ...raffle, id: newId, sold: 0, entries: [], ended: false, winner: null, createdAt: now(), sales: [] }
         next = [...curr, newRaffle]
         action = 'create_raffle'
         target = newId
