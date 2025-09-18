@@ -6,6 +6,7 @@ import { useRaffles } from '../context/RaffleContext'
 import { useNotify } from '../context/NotificationContext'
 import { useAudit } from '../context/AuditContext'
 import { useTranslation } from 'react-i18next'
+import { formatCurrency } from '../utils/currency'
 
 export default function Admin() {
   const { getAllUsers, hasRole } = useAuth()
@@ -48,7 +49,7 @@ function RafflesAdmin({ raffles, onSave, onEnd }) {
         {raffles.map(r => (
           <div key={r.id} className="p-4 rounded-xl bg-black/20 border border-white/10 space-y-2">
             <div className="font-semibold">{r.title}</div>
-            <div className="text-sm text-white/70">Sold {r.sold}/{r.totalTickets} • Ticket ${r.ticketPrice}</div>
+            <div className="text-sm text-white/70">Sold {r.sold}/{r.totalTickets} • Ticket {formatCurrency(r.ticketPrice)}</div>
             <div className="text-sm">Ends: {new Date(r.endsAt).toLocaleString()}</div>
             <div className="flex gap-2">
               <button className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" onClick={()=>setEditing(r)}>{t('admin.edit')}</button>
@@ -209,7 +210,7 @@ function UsersAdmin({ users }) {
             {list.map(u => (
               <tr key={u.username} className="border-t border-white/10">
                 <td className="p-2">{u.username}</td>
-                <td className="p-2">${(u.balance||0).toFixed(2)}</td>
+                <td className="p-2">{formatCurrency(u.balance || 0)}</td>
                 <td className="p-2">{u.roles?.includes('admin')?t('admin.yes'):t('admin.no')}</td>
                 <td className="p-2">
                   <div className="flex gap-2">
@@ -379,7 +380,7 @@ function AnalyticsAdmin({ raffles, users = [] }) {
     )
   }
 
-  const currency = (n) => `$${(n || 0).toFixed(2)}`
+  const currency = (n) => formatCurrency(n || 0)
 
   return (
     <div className="glass rounded-2xl p-6 space-y-6">
@@ -388,7 +389,7 @@ function AnalyticsAdmin({ raffles, users = [] }) {
       {/* KPI Cards */}
       <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
         <StatCard title="Tickets Sold" value={totalTickets} />
-        <StatCard title="Revenue (demo)" value={currency(revenue)} />
+        <StatCard title="Revenue (Test Mode)" value={currency(revenue)} />
         <StatCard title="Prize Cost (all)" value={currency(prizeCostTotal)} />
         <StatCard title="Profit (all)" value={currency(profitTotal)} />
 
@@ -424,11 +425,11 @@ function AnalyticsAdmin({ raffles, users = [] }) {
         </div>
         <Funnel stages={[
           { label: 'Registered', value: totalUsers },
-          { label: 'Topped Up (demo)', value: toppedUpUsers.length },
+          { label: 'Topped Up (test mode)', value: toppedUpUsers.length },
           { label: 'Joined a Raffle', value: buyersCount },
         ]}/>
         <div className="mt-3 text-xs text-white/60">
-          Demo heuristic: users with balance ≠ 100 or with entries are considered "topped up".
+          Test-mode heuristic: users with balance ≠ 100 or with entries are considered "topped up".
         </div>
       </div>
 

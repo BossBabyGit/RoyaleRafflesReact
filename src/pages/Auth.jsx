@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next'
 
 export default function Auth() {
   const [mode, setMode] = useState('login')
-  const [username, setUsername] = useState('demo')
-  const [password, setPassword] = useState('demo')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const { login, register } = useAuth()
   const nav = useNavigate()
@@ -29,7 +29,7 @@ export default function Auth() {
     <div className="py-10 flex items-center justify-center">
       <div className="glass rounded-3xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold">{mode==='login'?t('auth.login'):t('auth.register')}</h2>
-        <p className="text-white/70 text-sm mt-1" dangerouslySetInnerHTML={{ __html: t('auth.demo') }} />
+        <p className="text-white/70 text-sm mt-1">{t('auth.testNotice')}</p>
         <div className="space-y-3 mt-6">
           <label htmlFor="auth-username" className="sr-only">{t('auth.username')}</label>
           <input

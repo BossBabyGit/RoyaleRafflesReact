@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { initiateDeposit, confirm3ds } from '../utils/paytriot'
+import { formatCurrency } from '../utils/currency'
 
 export default function DepositModal({ amount, onClose, onSuccess }) {
   const [step, setStep] = useState('form')
@@ -43,11 +44,14 @@ export default function DepositModal({ amount, onClose, onSuccess }) {
         {step === 'form' && (
             <>
               <div className="flex items-start justify-between">
-                <h3 className="text-xl font-semibold">Add Funds</h3>
+                <div>
+                  <h3 className="text-xl font-semibold">Add Funds (Test Mode)</h3>
+                  <p className="text-xs text-white/60">No live payments are processed in this environment.</p>
+                </div>
                 <button onClick={onClose} className="text-white/60 hover:text-white">✕</button>
               </div>
               <div className="space-y-2">
-                <div className="text-sm text-white/70">Amount: <b className="text-blue-light">${amount.toFixed(2)}</b></div>
+                <div className="text-sm text-white/70">Amount: <b className="text-blue-light">{formatCurrency(amount)}</b></div>
                 <label htmlFor="card-number" className="sr-only">Card Number</label>
                 <input
                   id="card-number"
@@ -108,7 +112,7 @@ export default function DepositModal({ amount, onClose, onSuccess }) {
         {step === '3ds' && (
           <div className="text-center space-y-4">
             <div className="text-lg font-semibold">3-D Secure Challenge</div>
-            <div className="text-sm text-white/70">Simulated verification for demo</div>
+            <div className="text-sm text-white/70">Simulated verification for test mode</div>
             <div className="flex justify-center gap-4 pt-4">
               <button
                 onClick={() => handle3ds(true)}
@@ -133,7 +137,7 @@ export default function DepositModal({ amount, onClose, onSuccess }) {
             {result === 'success' ? (
               <div>
                 <div className="text-lg font-semibold text-green-400">Deposit Successful</div>
-                <div className="text-sm text-white/70">${amount.toFixed(2)} added to your wallet.</div>
+                <div className="text-sm text-white/70">{formatCurrency(amount)} added to your wallet.</div>
               </div>
             ) : (
               <div>

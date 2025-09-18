@@ -62,6 +62,7 @@ export default function Home() {
                 🏆 <span className="text-white/80">{t('home.winners')}</span> <b>{winners}</b>
               </div>
             </div>
+            <p className="text-xs text-white/60 mt-4">Example prizes shown for demonstration. 18+ UK residents only. No purchase necessary — see each prize page for free entry details.</p>
           </div>
 
           {/* RIGHT: Feature card (clean, optional) */}

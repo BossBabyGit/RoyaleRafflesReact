@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import badges, { dailyChallenges, weeklyChallenges } from '../data/badges'
 import BadgeGallery from '../components/BadgeGallery'
 import EntryHistory from '../components/EntryHistory'
+import { formatCurrency } from '../utils/currency'
 
 export default function Dashboard() {
   const { getProfile, updateProfile } = useAuth()
@@ -49,7 +50,7 @@ export default function Dashboard() {
       balance: u.balance + a,
       deposits: [...(u.deposits || []), { id: Date.now(), amount: a, date: new Date().toISOString() }]
     }))
-    notify(`Added $${a.toFixed(2)} to your balance`)
+    notify(`Added ${formatCurrency(a)} to your balance`)
     log({ type: 'topup', user: profile.username, amount: a })
   }
 
@@ -60,7 +61,7 @@ export default function Dashboard() {
       </div>
       <section className="glass rounded-2xl p-6">
         <h2 className="text-2xl font-bold">{t('dashboard.myWallet')}</h2>
-        <div className="mt-2 text-white/80">{t('dashboard.currentBalance')} <b className="text-blue-light">${profile.balance.toFixed(2)}</b></div>
+        <div className="mt-2 text-white/80">{t('dashboard.currentBalance')} <b className="text-blue-light">{formatCurrency(profile.balance)}</b></div>
         <div className="mt-3 flex items-center gap-2">
           <label htmlFor="deposit-amount" className="sr-only">Amount</label>
           <input
@@ -78,7 +79,7 @@ export default function Dashboard() {
           {(profile.deposits || []).map(d => (
             <div key={d.id} className="flex justify-between border-b border-white/10 pb-1">
               <span>{new Date(d.date).toLocaleString()}</span>
-              <span className="text-blue-light">${d.amount.toFixed(2)}</span>
+              <span className="text-blue-light">{formatCurrency(d.amount)}</span>
             </div>
           ))}
           {(!profile.deposits || profile.deposits.length === 0) && <div className="text-white/60">{t('dashboard.noDeposits')}</div>}

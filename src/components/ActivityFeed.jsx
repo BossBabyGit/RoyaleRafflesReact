@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { formatCurrency } from '../utils/currency'
 
-// Generate random demo events for the activity feed
+// Generate random sample events for the activity feed
 function createDummyEvent() {
   const id = Date.now() + Math.random()
   const users = ['Alice', 'Bob', 'Charlie', 'Dana']
@@ -62,7 +63,7 @@ export default function ActivityFeed() {
       return `${e.user} bought ${e.count} ticket${e.count > 1 ? 's' : ''} for Raffle #${e.raffleId}`
     }
     if (e.type === 'topup') {
-      return `${e.user} added $${e.amount.toFixed(2)} to their balance`
+      return `${e.user} added ${formatCurrency(e.amount)} to their balance`
     }
     if (e.type === 'raffle_end') {
       return `${e.winner} won the Raffle #${e.raffleId} raffle 🎉`

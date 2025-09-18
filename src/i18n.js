@@ -7,6 +7,7 @@ const resources = {
       header: {
         home: 'Home',
         raffles: 'Raffles',
+        howItWorks: 'How It Works',
         community: 'Community Vote',
         hall: 'Hall of Fame',
         account: 'My Account',
@@ -19,7 +20,7 @@ const resources = {
       auth: {
         login: 'Login',
         register: 'Register',
-        demo: 'Use <b>demo/demo</b> to log in with a preloaded balance.',
+        testNotice: 'Use the staging credentials supplied by Northedge Group to access this test environment. All transactions are simulated.',
         username: 'Username',
         password: 'Password',
         createAccount: 'Create account',
@@ -28,7 +29,7 @@ const resources = {
       },
       home: {
         tagline: 'Play • Win • Repeat',
-        description: 'Enter raffles using your on-site balance, discover trending prizes, and track your wins — all in one playful, modern experience.',
+        description: 'Explore showcase raffles, preview example prizes, and experience the full Royale Raffles journey from entry to fair, transparent draws.',
         browse: 'Browse Raffles',
         login: 'Login / Register',
         ticketsSold: 'Tickets sold:',
@@ -44,7 +45,7 @@ const resources = {
         instantEntry: 'Instant Entry',
         topRaffles: "This Week's Top Raffles",
         trustSecure: 'Secure Top-Ups',
-        trustFair: 'Fair, random winners',
+        trustFair: 'Fair, independently verified draws',
         trustInstant: 'Instant ticket purchase'
       },
       raffles: {
@@ -153,6 +154,7 @@ const resources = {
       header: {
         home: 'Inicio',
         raffles: 'Rifas',
+        howItWorks: 'Cómo funciona',
         community: 'Votación comunitaria',
         hall: 'Salón de la Fama',
         account: 'Mi cuenta',
@@ -165,7 +167,7 @@ const resources = {
       auth: {
         login: 'Iniciar sesión',
         register: 'Registrarse',
-        demo: 'Usa <b>demo/demo</b> para iniciar con saldo precargado.',
+        testNotice: 'Utiliza las credenciales de prueba proporcionadas por Northedge Group para acceder a este entorno. Todas las transacciones son simuladas.',
         username: 'Usuario',
         password: 'Contraseña',
         createAccount: 'Crear cuenta',
@@ -174,7 +176,7 @@ const resources = {
       },
       home: {
         tagline: 'Juega • Gana • Repite',
-        description: 'Entra a rifas con tu saldo, descubre premios de moda y sigue tus victorias — todo en una experiencia moderna.',
+        description: 'Explora rifas de ejemplo, descubre premios destacados y vive la experiencia completa de Royale Raffles con sorteos justos y transparentes.',
         browse: 'Ver Rifas',
         login: 'Iniciar / Registrar',
         ticketsSold: 'Boletos vendidos:',
@@ -190,7 +192,7 @@ const resources = {
         instantEntry: 'Entrada instantánea',
         topRaffles: 'Las mejores rifas de esta semana',
         trustSecure: 'Recargas seguras',
-        trustFair: 'Ganadores justos y aleatorios',
+        trustFair: 'Sorteos justos y verificables',
         trustInstant: 'Compra de boletos instantánea'
       },
       raffles: {
