@@ -7,16 +7,16 @@ import { useTranslation } from 'react-i18next'
 export default function Raffles() {
   const { raffles, purchase } = useRaffles()
   const [q, setQ] = useState('')
-  const [cat, setCat] = useState('All')
-  const [status, setStatus] = useState('Active')
+  const [cat, setCat] = useState('all')
+  const [status, setStatus] = useState('active')
   const [sort, setSort] = useState('ending')
   const { t } = useTranslation()
 
   const filtered = useMemo(() => {
     return raffles.filter(r => {
       const matchesQ = r.title.toLowerCase().includes(q.toLowerCase())
-      const matchesCat = cat === 'All' || r.category === cat
-      const matchesStatus = status === 'All' || (status==='Active' ? !r.ended : r.ended)
+      const matchesCat = cat === 'all' || r.category === cat
+      const matchesStatus = status === 'all' || (status === 'active' ? !r.ended : r.ended)
       return matchesQ && matchesCat && matchesStatus
     }).sort((a,b)=>{
       if (sort==='ending') return a.endsAt - b.endsAt
@@ -45,13 +45,15 @@ export default function Raffles() {
             className="md:col-span-2 bg-black/30 border border-white/10 rounded-xl px-3 py-2 outline-none"
           />
           <select value={cat} onChange={e=>setCat(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2">
-            <option>{t('raffles.all')}</option>
-            {cats.map(c=><option key={c}>{c}</option>)}
+            <option value="all">{t('raffles.all')}</option>
+            {cats.map(c=>(
+              <option key={c} value={c}>{c}</option>
+            ))}
           </select>
           <select value={status} onChange={e=>setStatus(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2">
-            <option>{t('raffles.active')}</option>
-            <option>{t('raffles.ended')}</option>
-            <option>{t('raffles.all')}</option>
+            <option value="active">{t('raffles.active')}</option>
+            <option value="ended">{t('raffles.ended')}</option>
+            <option value="all">{t('raffles.all')}</option>
           </select>
           <select value={sort} onChange={e=>setSort(e.target.value)} className="bg-black/30 border border-white/10 rounded-xl px-3 py-2">
             <option value="ending">{t('raffles.endingSoon')}</option>
