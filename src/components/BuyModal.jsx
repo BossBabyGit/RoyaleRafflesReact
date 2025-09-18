@@ -6,12 +6,13 @@ import { formatCurrency } from '../utils/currency'
 export default function BuyModal({ r, onClose, onPurchase }) {
   const [count, setCount] = useState(1)
   const [err, setErr] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const { user } = useAuth()
 
   const maxByCap = Math.floor(r.totalTickets * 0.5)
   const available = r.totalTickets - r.sold
 
-  const handleBuy = () => {
+  const handleBuy = async () => {
     const c = parseInt(count || 0, 10)
     if (!user) {
       setErr('Please login first.')
@@ -19,9 +20,20 @@ export default function BuyModal({ r, onClose, onPurchase }) {
     }
     if (c <= 0) { setErr('Enter at least 1 ticket'); return }
     if (c > available) { setErr('Not enough tickets available'); return }
-    const res = onPurchase(r.id, c)
-    if (!res.ok) setErr(res.error)
-    else onClose()
+    setErr('')
+    setSubmitting(true)
+    try {
+      const res = await onPurchase(r.id, c)
+      if (!res?.ok) {
+        setErr(res?.error || 'Unable to complete purchase.')
+      } else {
+        onClose()
+      }
+    } catch (error) {
+      setErr(error?.message || 'Unable to complete purchase.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -52,8 +64,8 @@ export default function BuyModal({ r, onClose, onPurchase }) {
           {err && <div className="text-sm text-red-400">{err}</div>}
         </div>
         <div className="flex items-center justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20">Cancel</button>
-          <button onClick={handleBuy} className="px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light">Pay & Enter</button>
+          <button onClick={onClose} className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20" disabled={submitting}>Cancel</button>
+          <button onClick={handleBuy} className="px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light disabled:opacity-50 disabled:cursor-not-allowed" disabled={submitting}>Pay & Enter</button>
         </div>
       </div>
     </div>

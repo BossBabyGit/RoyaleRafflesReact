@@ -62,9 +62,7 @@ export default function RaffleDetails() {
 
   const shareText = `I joined this raffle for free on Royale Raffles! ${window.location.origin}/raffles/${r.id}`
   const shareUrl = window.location.origin + '/raffles/' + r.id
-  const handleShared = () => {
-    claimFreeTicket(r.id)
-  }
+  const handleShared = () => claimFreeTicket(r.id)
 
   return (
     <div className="py-8 space-y-6">

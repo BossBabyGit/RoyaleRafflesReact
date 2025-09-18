@@ -4,7 +4,7 @@ export default function ShareModal({ shareText, url, onClose, onShared }) {
   const encodedUrl = encodeURIComponent(url)
   const encodedText = encodeURIComponent(shareText)
 
-  const handleShare = (platform) => {
+  const handleShare = async (platform) => {
     let shareUrl = ''
     switch (platform) {
       case 'twitter':
@@ -21,8 +21,11 @@ export default function ShareModal({ shareText, url, onClose, onShared }) {
     }
     if (shareUrl) {
       window.open(shareUrl, '_blank')
-      onShared()
-      onClose()
+      try {
+        await onShared?.()
+      } finally {
+        onClose()
+      }
     }
   }
 
