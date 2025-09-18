@@ -30,7 +30,7 @@ export default function BuyModal({ r, onClose, onPurchase }) {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-xl font-semibold">Enter Raffle</h3>
-            <p className="text-xs text-white/60">Test Mode checkout — no live payments are processed.</p>
+            <p className="text-xs text-white/60">Test Mode checkout - no live payments are processed.</p>
           </div>
           <button onClick={onClose} className="text-white/60 hover:text-white">✕</button>
         </div>
