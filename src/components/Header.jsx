@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-black/30 backdrop-blur border-b border-white/10">
       <div className="bg-blue/10 border-b border-white/10 text-center text-xs text-white/70 py-1">
-        Test Mode environment — payments and draws are for demonstration only.
+        Test Mode environment - payments and draws are for demonstration only.
       </div>
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-3">
