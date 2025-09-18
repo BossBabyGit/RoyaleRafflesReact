@@ -9,6 +9,15 @@ const RaffleCtx = createContext(null)
 
 const now = () => new Date().getTime()
 
+function getStorage() {
+  if (typeof window === 'undefined') return null
+  try {
+    return window.localStorage
+  } catch {
+    return null
+  }
+}
+
 function drawWinner(r) {
   let winner = null
   if (r.entries && r.entries.length > 0) {
@@ -20,15 +29,37 @@ function drawWinner(r) {
 }
 
 function loadRaffles() {
-  const raw = localStorage.getItem('rr_raffles')
-  if (raw) return JSON.parse(raw)
+  const storage = getStorage()
+  if (!storage) {
+    return seed()
+  }
+
+  try {
+    const raw = storage.getItem('rr_raffles')
+    if (raw) {
+      return JSON.parse(raw)
+    }
+  } catch (err) {
+    console.warn('Failed to load raffles from storage, reseeding.', err)
+  }
+
   const seeded = seed()
-  localStorage.setItem('rr_raffles', JSON.stringify(seeded))
+  try {
+    storage.setItem('rr_raffles', JSON.stringify(seeded))
+  } catch (err) {
+    console.warn('Failed to persist seeded raffles to storage.', err)
+  }
   return seeded
 }
 
 function saveRaffles(raffles) {
-  localStorage.setItem('rr_raffles', JSON.stringify(raffles))
+  const storage = getStorage()
+  if (!storage) return
+  try {
+    storage.setItem('rr_raffles', JSON.stringify(raffles))
+  } catch (err) {
+    console.warn('Failed to save raffles to storage.', err)
+  }
 }
 
 export function RaffleProvider({ children }) {
