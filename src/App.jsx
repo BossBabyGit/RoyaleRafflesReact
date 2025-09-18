@@ -2,7 +2,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
-import ActivityFeed from './components/ActivityFeed'
 import Home from './pages/Home'
 import Raffles from './pages/Raffles'
 import RaffleDetails from './pages/RaffleDetails'
@@ -29,7 +28,6 @@ export default function App() {
   return (
     <div className={`text-white min-h-screen flex flex-col transition-[padding] duration-300 ${collapsed ? '' : 'sm:pr-[360px]'}`}>
       <Header />
-      <ActivityFeed />
       <main className="flex-1 px-4 md:px-8 max-w-7xl mx-auto w-full">
         <Routes>
           <Route path="/" element={<Home />} />

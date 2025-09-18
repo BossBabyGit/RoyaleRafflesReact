@@ -7,10 +7,7 @@ export default function Footer() {
         <div className="space-y-4">
           <Link to="/" className="flex items-center gap-3 text-2xl font-extrabold tracking-tight text-white">
             <img src="/logo.png" alt="Royale Raffles" className="h-10 w-10 rounded-lg object-contain border border-white/10" />
-            <div>
-              <span className="text-claret">Royale</span>
-              <span className="text-blue-light">Raffles</span>
-            </div>
+            <span className="sr-only">Royale Raffles</span>
           </Link>
           <p className="text-white/80">UK prize competitions • 18+ only • Free entry available</p>
           <p className="text-xs text-white/50">© {new Date().getFullYear()} Royale Raffles. All rights reserved.</p>
@@ -35,8 +32,7 @@ export default function Footer() {
         <div>
           <h3 className="text-white font-semibold mb-4">Company</h3>
           <p className="text-white/80">Operated by Northedge Group Ltd</p>
-          <p className="text-white/60">Company No. 13245678</p>
-          <p className="text-white/60">71-75 Shelton Street, Covent Garden, London, WC2H 9JQ</p>
+          <p className="text-white/60">NORTHEDGE GROUP LTD • Company number 16579252</p>
           <p className="text-white/60">Support: support@northedgegroup.co.uk</p>
         </div>
         <div>

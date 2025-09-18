@@ -5,7 +5,7 @@ export default function seed() {
   return [
     {
       id: 1,
-      title: "Example Prize: iPhone 15 Pro (256GB)",
+      title: "iPhone 15 Pro (256GB)",
       image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?q=80&w=1200&auto=format&fit=crop",
       description: "Flagship Apple smartphone with the A17 Pro chip, 6.1-inch Super Retina XDR display and pro camera system.",
       dioramaUrl: "/dioramas/sample.json",
@@ -25,7 +25,7 @@ export default function seed() {
     },
     {
       id: 2,
-      title: "Example Prize: PlayStation 5 Slim Bundle",
+      title: "PlayStation 5 Slim Bundle",
       image: "https://images.unsplash.com/photo-1606813907291-76b1b83d9a4c?q=80&w=1200&auto=format&fit=crop",
       description: "Latest generation PlayStation 5 Slim with DualSense controller and digital download of a blockbuster title.",
       value: 479,
@@ -44,7 +44,7 @@ export default function seed() {
     },
     {
       id: 3,
-      title: "Example Prize: MacBook Air 13\" (M3)",
+      title: "MacBook Air 13\" (M3)",
       image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop",
       description: "Lightweight MacBook Air with the M3 chip, 8GB unified memory and 256GB SSD — perfect for work or study.",
       value: 1299,
@@ -63,7 +63,7 @@ export default function seed() {
     },
     {
       id: 4,
-      title: "Example Prize: Nintendo Switch OLED",
+      title: "Nintendo Switch OLED",
       image: "https://images.unsplash.com/photo-1605901309584-818e25960a81?q=80&w=1200&auto=format&fit=crop",
       description: "Versatile Nintendo Switch OLED console with 64GB storage and neon red/blue Joy-Con controllers.",
       value: 309,
@@ -82,7 +82,7 @@ export default function seed() {
     },
     {
       id: 5,
-      title: "Example Prize: Dyson V15 Detect Absolute",
+      title: "Dyson V15 Detect Absolute",
       image: "https://images.unsplash.com/photo-1610276198568-eb6d0ff53e48?q=80&w=1200&auto=format&fit=crop",
       description: "Top-of-the-range Dyson cordless vacuum with laser dust detection and smart LCD reporting.",
       value: 629,

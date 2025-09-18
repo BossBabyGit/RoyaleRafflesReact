@@ -13,9 +13,9 @@ export default function HowItWorks() {
       </header>
 
       <section className="glass rounded-2xl p-6 space-y-4">
-        <h2 className="text-2xl font-semibold">1. Browse Example Prizes</h2>
+        <h2 className="text-2xl font-semibold">1. Browse Prizes</h2>
         <p className="text-white/70 text-sm">
-          Explore our curated list of example prizes on the <Link to="/raffles" className="text-blue-light underline">Competitions page</Link>.
+          Explore our curated list of prizes on the <Link to="/raffles" className="text-blue-light underline">Competitions page</Link>.
           Each listing shows the total prize value in pounds sterling, ticket price, closing time and the number of tickets available.
           Customers can purchase entries instantly or claim one free entry by completing the postal route detailed on every prize page.
         </p>
@@ -25,7 +25,7 @@ export default function HowItWorks() {
         <h2 className="text-2xl font-semibold">2. How Raffles Are Drawn</h2>
         <ul className="list-disc list-inside text-white/70 text-sm space-y-2">
           <li>When the countdown ends or all tickets sell out, entries are locked and exported for the draw.</li>
-          <li>An independently verified random number generator selects the winning ticket.</li>
+          <li>The winning ticket is selected via the RANDOM.ORG verified draw service.</li>
           <li>Our compliance team double-checks eligibility (18+ UK resident, entry limits, free-entry submissions).</li>
           <li>The winner is contacted immediately and announced on the Winners Hub with their anonymised initials.</li>
         </ul>
