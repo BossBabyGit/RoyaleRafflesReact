@@ -10,13 +10,17 @@ import { formatCurrency } from '../utils/currency'
 
 export default function Admin() {
   const { getAllUsers, hasRole } = useAuth()
-  const { raffles, upsertRaffle, endRaffleManually } = useRaffles()
+  const { raffles, upsertRaffle, endRaffleManually, refreshRaffles } = useRaffles()
   const { notify } = useNotify()
   const { logs } = useAudit()
   const [tab, setTab] = useState('raffles')
   const { t } = useTranslation()
 
   if (!hasRole('admin')) return <Navigate to="/auth" replace />
+
+  useEffect(() => {
+    refreshRaffles()
+  }, [refreshRaffles])
 
   return (
     <div className="py-8 space-y-6">
@@ -26,7 +30,29 @@ export default function Admin() {
         <button className={"px-3 py-1.5 rounded-xl " + (tab==='analytics'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('analytics')}>{t('admin.analytics')}</button>
         <button className={"px-3 py-1.5 rounded-xl " + (tab==='activity'?'bg-blue-light':'bg-white/10')} onClick={()=>setTab('activity')}>{t('admin.activity')}</button>
       </div>
-      {tab==='raffles' && <RafflesAdmin raffles={raffles} onSave={(r)=>{upsertRaffle(r); notify('Raffle saved')}} onEnd={(id)=>{endRaffleManually(id); notify('Raffle ended')}} />}
+      {tab==='raffles' && (
+        <RafflesAdmin
+          raffles={raffles}
+          onSave={async (r) => {
+            const res = await upsertRaffle(r)
+            if (res?.ok) {
+              notify('Raffle saved')
+            } else if (res?.error) {
+              notify(res.error, 'error')
+            }
+            return res
+          }}
+          onEnd={async (id) => {
+            const res = await endRaffleManually(id)
+            if (res?.ok) {
+              notify('Raffle ended')
+            } else if (res?.error) {
+              notify(res.error, 'error')
+            }
+            return res
+          }}
+        />
+      )}
       {tab==='users' && <UsersAdmin users={getAllUsers()} />}
       {tab==='analytics' && <AnalyticsAdmin raffles={raffles} users={getAllUsers()} />}
       {tab==='activity' && <ActivityLog logs={logs} />}
@@ -58,7 +84,22 @@ function RafflesAdmin({ raffles, onSave, onEnd }) {
           </div>
         ))}
       </div>
-      {editing && <RaffleEditor data={editing} onClose={()=>setEditing(null)} onSave={(d)=>{onSave(d); setEditing(null)}}/>}
+      {editing && (
+        <RaffleEditor
+          data={editing}
+          onClose={()=>setEditing(null)}
+          onSave={async (d) => {
+            try {
+              const res = await onSave(d)
+              if (!res || res.ok) {
+                setEditing(null)
+              }
+            } catch (err) {
+              console.error('Failed to save raffle', err)
+            }
+          }}
+        />
+      )}
     </div>
   )
 }
