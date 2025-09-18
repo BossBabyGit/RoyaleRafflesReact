@@ -18,7 +18,7 @@ function seedMessages() {
     ],
     giveaways: [
       { id: 'm3', author: 'charlie', text: 'What\u2019s the next prize? PS5 or Cash?', ts: now - 1000 * 60 * 3 },
-      { id: 'm4', author: 'demo', text: 'Vote on the Community page!', ts: now - 1000 * 60 * 2 },
+      { id: 'm4', author: 'host', text: 'Vote on the Community page!', ts: now - 1000 * 60 * 2 },
     ],
     winners: [
       { id: 'm5', author: 'alice', text: 'GG to the PS5 winner last night \uD83C\uDF89', ts: now - 1000 * 60 },

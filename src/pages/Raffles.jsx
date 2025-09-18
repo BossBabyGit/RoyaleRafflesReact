@@ -30,6 +30,9 @@ export default function Raffles() {
 
   return (
     <div className="py-8">
+      <div className="glass rounded-2xl p-4 mb-6 text-sm text-white/80 border border-white/10">
+        <p><strong>Important:</strong> Royale Raffles competitions are open to UK residents aged 18 and over. Every prize has a free postal entry route and all prices are displayed in pounds sterling.</p>
+      </div>
       <div className="glass rounded-2xl p-4 md:p-6">
         <div className="grid md:grid-cols-5 gap-3">
           <label htmlFor="raffle-search" className="sr-only">{t('raffles.search')}</label>

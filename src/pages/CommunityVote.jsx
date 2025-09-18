@@ -111,7 +111,7 @@ export default function CommunityVote() {
     options: [
       { id: 'ps5', label: 'PS5', image: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/PlayStation_5.png' },
       { id: 'iphone', label: 'iPhone 15', image: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/IPhone_15_Pink.svg' },
-      { id: 'cash', label: 'Cash Prize', image: 'https://upload.wikimedia.org/wikipedia/commons/1/12/US_one_hundred_dollar_bill%2C_obverse%2C_series_2009.jpg' },
+      { id: 'cash', label: '£1,000 Cash Bundle', image: 'https://images.unsplash.com/photo-1605721911519-3dfeb3be17b2?q=80&w=1200&auto=format&fit=crop' },
       { id: 'switch', label: 'Nintendo Switch', image: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Nintendo_Switch_%28White%29.png' }
     ]
   }

@@ -30,7 +30,7 @@ export default function ShareModal({ shareText, url, onClose, onShared }) {
     <div className="fixed inset-0 bg-black/60 backdrop-blur flex items-center justify-center z-50 p-4">
       <div className="glass rounded-2xl w-full max-w-md p-6 space-y-4">
         <div className="flex items-start justify-between">
-          <h3 className="text-xl font-semibold">Share to claim free ticket</h3>
+          <h3 className="text-xl font-semibold">Share to claim free entry</h3>
           <button onClick={onClose} className="text-white/60 hover:text-white">✕</button>
         </div>
         <div className="flex flex-col gap-3">

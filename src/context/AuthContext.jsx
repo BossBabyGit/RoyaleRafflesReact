@@ -13,9 +13,9 @@ function getWeekKey(date) {
 
 const AuthCtx = createContext(null)
 
-const DEMO_USER = {
-  username: 'demo',
-  password: 'demo',
+const TEST_USER = {
+  username: 'testplayer',
+  password: 'testplayer',
   balance: 500,
   entries: {}, // { raffleId: numberOfTickets }
   wins: [],
@@ -36,8 +36,8 @@ function loadUsers() {
   const raw = localStorage.getItem('rr_users')
   let users = raw ? JSON.parse(raw) : {}
 
-  if (!users['demo']) {
-    users['demo'] = DEMO_USER
+  if (!users['testplayer']) {
+    users['testplayer'] = TEST_USER
     users['admin'] = { username:'admin', password:'admin', balance: 10000, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, roles:['admin'], avatar:'', email:'' }
     users['alice'] = { username:'alice', password:'alice', balance: 800, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, roles:[], avatar:'', email:'' }
     users['bob'] = { username:'bob', password:'bob', balance: 600, entries:{}, wins:[], history:[], deposits:[], freeEntries:{}, roles:[], avatar:'', email:'' }

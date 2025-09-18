@@ -12,6 +12,9 @@ import Auth from './pages/Auth'
 import Admin from './pages/Admin'
 import HallOfFame from './pages/HallOfFame'
 import CommunityVote from './pages/CommunityVote'
+import HowItWorks from './pages/HowItWorks'
+import Terms from './pages/Terms'
+import Privacy from './pages/Privacy'
 import { useAuth } from './context/AuthContext'
 import ChatDock from './components/chat/ChatDock'
 import { useChat } from './context/ChatContext'
@@ -31,13 +34,16 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/raffles" element={<Raffles />} />
-            <Route path="/raffles/:id" element={<RaffleDetails />} />
+          <Route path="/raffles/:id" element={<RaffleDetails />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/hall-of-fame" element={<HallOfFame />} />
           <Route path="/community-vote" element={<CommunityVote />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><ProfileSettings /></PrivateRoute>} />
           <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

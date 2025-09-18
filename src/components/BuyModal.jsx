@@ -1,6 +1,7 @@
 
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { formatCurrency } from '../utils/currency'
 
 export default function BuyModal({ r, onClose, onPurchase }) {
   const [count, setCount] = useState(1)
@@ -27,7 +28,10 @@ export default function BuyModal({ r, onClose, onPurchase }) {
     <div className="fixed inset-0 bg-black/60 backdrop-blur flex items-center justify-center z-50 p-4">
       <div className="glass rounded-2xl w-full max-w-md p-6 space-y-4">
         <div className="flex items-start justify-between">
-          <h3 className="text-xl font-semibold">Enter Raffle</h3>
+          <div>
+            <h3 className="text-xl font-semibold">Enter Raffle</h3>
+            <p className="text-xs text-white/60">Test Mode checkout — no live payments are processed.</p>
+          </div>
           <button onClick={onClose} className="text-white/60 hover:text-white">✕</button>
         </div>
         <p className="text-white/80 text-sm">How many tickets would you like to buy for <b>{r.title}</b>?</p>
@@ -44,7 +48,7 @@ export default function BuyModal({ r, onClose, onPurchase }) {
             aria-label="Ticket count"
           />
           <div className="text-xs text-white/70">Max per user: <b>{maxByCap}</b> • Available: <b>{available}</b></div>
-          <div className="text-sm">Total: <b className="text-blue-light">${(r.ticketPrice * (parseInt(count||0,10)||0)).toFixed(2)}</b></div>
+          <div className="text-sm">Total: <b className="text-blue-light">{formatCurrency(r.ticketPrice * (parseInt(count||0,10)||0))}</b></div>
           {err && <div className="text-sm text-red-400">{err}</div>}
         </div>
         <div className="flex items-center justify-end gap-2">
