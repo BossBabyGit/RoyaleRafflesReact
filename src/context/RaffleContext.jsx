@@ -2,11 +2,79 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useNotify } from './NotificationContext'
 import { useAuth } from './AuthContext'
 import { useAudit } from './AuditContext'
+import seed from '../data/raffles'
 
 const RaffleCtx = createContext(null)
 
 const now = () => new Date().getTime()
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
+const RAFFLES_STORAGE_KEY = 'rr_raffles'
+
+function getRaffleStorage() {
+  try {
+    if (typeof window === 'undefined') return null
+    return window.localStorage ?? null
+  } catch (err) {
+    console.warn('Accessing localStorage for raffles failed', err)
+    return null
+  }
+}
+
+function loadStoredRaffles() {
+  const storage = getRaffleStorage()
+  if (!storage) return null
+  try {
+    const raw = storage.getItem(RAFFLES_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : null
+  } catch (err) {
+    console.warn('Failed to parse raffles from storage', err)
+    return null
+  }
+}
+
+function storeRaffles(list) {
+  const storage = getRaffleStorage()
+  if (!storage || !Array.isArray(list)) return
+  try {
+    storage.setItem(RAFFLES_STORAGE_KEY, JSON.stringify(list))
+  } catch (err) {
+    console.warn('Failed to persist raffles to storage', err)
+  }
+}
+
+function normalizeRaffle(data, fallback = {}) {
+  const defaults = {
+    sold: 0,
+    entries: [],
+    ended: false,
+    winner: null,
+  }
+  const merged = { ...defaults, ...fallback, ...data }
+  merged.entries = Array.isArray(merged.entries) ? merged.entries : []
+  merged.sold = Number.isFinite(Number(merged.sold)) ? Number(merged.sold) : 0
+  merged.totalTickets = Number.isFinite(Number(merged.totalTickets)) ? Number(merged.totalTickets) : 0
+  merged.ticketPrice = Number.isFinite(Number(merged.ticketPrice)) ? Number(merged.ticketPrice) : 0
+  merged.value = Number.isFinite(Number(merged.value)) ? Number(merged.value) : merged.value
+  return merged
+}
+
+function chooseWinner(raffle) {
+  const entries = Array.isArray(raffle?.entries) ? raffle.entries : []
+  const pool = entries.reduce((acc, entry) => acc + (Number(entry?.count) || 0), 0)
+  if (pool <= 0) return null
+  const target = Math.random() * pool
+  let cursor = 0
+  for (const entry of entries) {
+    const count = Number(entry?.count) || 0
+    cursor += count
+    if (target < cursor) {
+      return entry?.username || null
+    }
+  }
+  return null
+}
 
 function resolvePath(path) {
   if (!path) return API_BASE
@@ -54,33 +122,43 @@ export function RaffleProvider({ children }) {
   const { notify, log } = useNotify()
   const { log: audit } = useAudit()
   const { user, getProfile, updateProfile, addHistory } = useAuth()
-  const [raffles, setRaffles] = useState([])
+  const [raffles, setRaffles] = useState(() => loadStoredRaffles() ?? [])
+
+  const setAndStoreRaffles = useCallback((updater) => {
+    setRaffles(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      if (Array.isArray(next)) {
+        storeRaffles(next)
+      }
+      return next
+    })
+  }, [])
 
   const applyServerPayload = useCallback((payload) => {
     if (!payload) return { applied: false, raffle: null }
 
     if (Array.isArray(payload)) {
-      setRaffles(payload)
+      setAndStoreRaffles(payload)
       return { applied: true, raffle: null }
     }
 
     if (Array.isArray(payload?.raffles)) {
-      setRaffles(payload.raffles)
+      setAndStoreRaffles(payload.raffles)
       return { applied: true, raffle: payload?.raffle ?? null }
     }
 
     if (Array.isArray(payload?.data)) {
-      setRaffles(payload.data)
+      setAndStoreRaffles(payload.data)
       return { applied: true, raffle: payload?.raffle ?? null }
     }
 
     if (Array.isArray(payload?.data?.raffles)) {
-      setRaffles(payload.data.raffles)
+      setAndStoreRaffles(payload.data.raffles)
       return { applied: true, raffle: payload?.data?.raffle ?? null }
     }
 
     if (payload?.raffle) {
-      setRaffles(curr => {
+      setAndStoreRaffles(curr => {
         const targetId = String(payload.raffle.id)
         const exists = curr.some(r => String(r.id) === targetId)
         return exists
@@ -91,7 +169,7 @@ export function RaffleProvider({ children }) {
     }
 
     if (payload?.id !== undefined) {
-      setRaffles(curr => {
+      setAndStoreRaffles(curr => {
         const targetId = String(payload.id)
         const exists = curr.some(r => String(r.id) === targetId)
         return exists
@@ -102,19 +180,95 @@ export function RaffleProvider({ children }) {
     }
 
     return { applied: false, raffle: null }
-  }, [setRaffles])
+  }, [setAndStoreRaffles])
+
+  const hydrateFromSeed = useCallback(() => {
+    const seeded = seed().map(r => normalizeRaffle(r))
+    const stored = loadStoredRaffles()
+
+    let data = seeded
+    if (Array.isArray(stored)) {
+      if (stored.length) {
+        const map = new Map(seeded.map(item => [String(item.id), item]))
+        stored.forEach(item => {
+          if (!item || item.id === undefined || item.id === null) return
+          const normalized = normalizeRaffle(item)
+          map.set(String(normalized.id), normalized)
+        })
+        data = Array.from(map.values())
+      } else {
+        data = stored
+      }
+    }
+
+    setAndStoreRaffles(data)
+    return data
+  }, [setAndStoreRaffles])
+
+  const applyLocalUpsert = useCallback((raffle) => {
+    let saved = null
+    setAndStoreRaffles(curr => {
+      const list = Array.isArray(curr) ? curr : []
+      if (raffle?.id !== undefined && raffle?.id !== null) {
+        const targetId = String(raffle.id)
+        let found = false
+        const next = list.map(item => {
+          if (String(item.id) === targetId) {
+            found = true
+            const merged = normalizeRaffle({ ...item, ...raffle, id: item.id }, item)
+            saved = merged
+            return merged
+          }
+          return item
+        })
+        if (!found) {
+          const normalized = normalizeRaffle({ ...raffle })
+          saved = normalized
+          return [...next, normalized]
+        }
+        return next
+      }
+
+      const maxId = list.reduce((acc, item) => Math.max(acc, Number(item?.id) || 0), 0)
+      const newId = maxId + 1
+      const normalized = normalizeRaffle({ ...raffle, id: newId })
+      saved = normalized
+      return [...list, normalized]
+    })
+    return saved
+  }, [setAndStoreRaffles])
+
+  const applyLocalEnd = useCallback((id) => {
+    let ended = null
+    setAndStoreRaffles(curr => {
+      const list = Array.isArray(curr) ? curr : []
+      const targetId = String(id)
+      const next = list.map(item => {
+        if (String(item.id) === targetId) {
+          const normalized = normalizeRaffle(item)
+          const winner = normalized.winner || chooseWinner(normalized)
+          ended = { ...normalized, ended: true, winner }
+          return ended
+        }
+        return item
+      })
+      return next
+    })
+    return ended
+  }, [setAndStoreRaffles])
 
   const refreshRaffles = useCallback(async () => {
     try {
       const payload = await apiRequest('/raffles')
       const { applied } = applyServerPayload(payload)
-      if (!applied && payload === null) {
-        setRaffles([])
+      if (!applied) {
+        hydrateFromSeed()
       }
     } catch (err) {
       console.error('Failed to fetch raffles from API', err)
+      hydrateFromSeed()
     }
-  }, [applyServerPayload])
+  }, [applyServerPayload, hydrateFromSeed])
 
   useEffect(() => {
     refreshRaffles()
@@ -253,42 +407,51 @@ export function RaffleProvider({ children }) {
   }, [raffles, getProfile, updateProfile, notify, log, applyServerPayload, refreshRaffles])
 
   const upsertRaffle = useCallback(async (raffle) => {
+    const hasId = Boolean(raffle?.id)
     try {
-      const hasId = Boolean(raffle.id)
       const payload = await apiRequest(hasId ? `/raffles/${raffle.id}` : '/raffles', {
         method: hasId ? 'PUT' : 'POST',
         body: raffle,
       })
       const { applied, raffle: updated } = applyServerPayload(payload)
-      if (!applied) {
-        await refreshRaffles()
-      }
-      const targetId = updated?.id ?? raffle.id
+      const saved = applied ? updated ?? raffle : applyLocalUpsert(updated ?? raffle)
+      const targetId = saved?.id ?? raffle?.id
       audit({ type: hasId ? 'update_raffle' : 'create_raffle', target: targetId, user: user?.username })
-      return { ok: true }
+      return { ok: true, raffle: saved ?? null, offline: !applied }
     } catch (err) {
       console.error('Failed to save raffle', err)
+      const saved = applyLocalUpsert(raffle)
+      if (saved) {
+        audit({ type: hasId ? 'update_raffle' : 'create_raffle', target: saved.id, user: user?.username })
+        return { ok: true, raffle: saved, offline: true }
+      }
       return { ok: false, error: err.message || 'Failed to save raffle' }
     }
-  }, [applyServerPayload, refreshRaffles, audit, user])
+  }, [applyServerPayload, audit, user, applyLocalUpsert])
 
   const endRaffleManually = useCallback(async (id) => {
     try {
       const payload = await apiRequest(`/raffles/${id}/end`, { method: 'POST' })
       const { applied, raffle: ended } = applyServerPayload(payload)
-      if (!applied) {
-        await refreshRaffles()
+      const result = applied ? ended ?? null : applyLocalEnd(id) ?? ended ?? null
+      if (result?.winner) {
+        log({ type: 'raffle_end', raffleId: result.id, winner: result.winner })
       }
-      if (ended?.winner) {
-        log({ type: 'raffle_end', raffleId: ended.id, winner: ended.winner })
-      }
-      audit({ type: 'end_raffle', target: id, user: user?.username })
-      return { ok: true, raffle: ended ?? null }
+      audit({ type: 'end_raffle', target: result?.id ?? id, user: user?.username })
+      return { ok: true, raffle: result, offline: !applied }
     } catch (err) {
       console.error('Failed to end raffle manually', err)
+      const local = applyLocalEnd(id)
+      if (local) {
+        if (local.winner) {
+          log({ type: 'raffle_end', raffleId: local.id, winner: local.winner })
+        }
+        audit({ type: 'end_raffle', target: local.id ?? id, user: user?.username })
+        return { ok: true, raffle: local, offline: true }
+      }
       return { ok: false, error: err.message || 'Failed to end raffle' }
     }
-  }, [applyServerPayload, refreshRaffles, log, audit, user])
+  }, [applyServerPayload, applyLocalEnd, log, audit, user])
 
   const topRaffles = useMemo(() => {
     const active = raffles.filter(r => !r.ended)
