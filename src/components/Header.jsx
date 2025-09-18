@@ -19,10 +19,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center gap-3">
             <img src="/logo.png" alt="Royale Raffles" className="h-10 w-10 rounded-lg object-contain border border-white/10" />
-            <div className="text-2xl font-extrabold tracking-tight leading-tight">
-              <span className="text-claret">Royale</span>
-              <span className="text-blue-light">Raffles</span>
-            </div>
+            <span className="sr-only">Royale Raffles</span>
           </Link>
           <span className="hidden sm:inline-flex items-center px-3 py-1 rounded-full border border-blue-light/50 text-xs text-blue-light/90 bg-blue-light/10">
             Test Mode

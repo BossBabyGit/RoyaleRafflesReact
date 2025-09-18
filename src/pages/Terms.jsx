@@ -4,7 +4,7 @@ export default function Terms() {
       <header className="glass rounded-3xl p-8 border border-white/10 space-y-3">
         <h1 className="text-3xl font-extrabold">Terms &amp; Conditions (Test Environment)</h1>
         <p className="text-white/70 text-sm">
-          Royale Raffles is a trading name of Northedge Group Ltd (Company No. 13245678). These terms outline how the
+          Royale Raffles is a trading name of Northedge Group Ltd (Company No. 16579252). These terms outline how the
           staging site operates ahead of final payment processor approval. The live service terms are materially the
           same, with the exception that all transactions here are simulated.
         </p>
@@ -23,7 +23,8 @@ export default function Terms() {
         <h2 className="text-2xl font-semibold">2. Free Postal Entry</h2>
         <p className="text-white/70 text-sm">
           To enter without purchase send your name, email, contact number, chosen raffle name and confirmation of your
-          eligibility to: <strong>Royale Raffles Free Entry, Northedge Group Ltd, 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ</strong>.
+          eligibility to the Royale Raffles free entry team. The full postal address will be confirmed ahead of launch and is available on request from{' '}
+          <a href="mailto:support@northedgegroup.co.uk" className="text-blue-light underline">support@northedgegroup.co.uk</a>.
           Postal entries must be received before the raffle closes. Illegible or incomplete entries will be rejected.
         </p>
       </section>
@@ -39,7 +40,7 @@ export default function Terms() {
       <section className="glass rounded-2xl p-6 space-y-3">
         <h2 className="text-2xl font-semibold">4. Winner Selection</h2>
         <p className="text-white/70 text-sm">
-          Winners are chosen at random using a certified random number generator. Draw logs are retained for a minimum
+          Winners are chosen at random via the RANDOM.ORG verified draw service. Draw logs are retained for a minimum
           of three years and can be provided to regulators or payment partners on request. Northedge Group Ltd reserves
           the right to void entries that breach these terms or exceed the ticket purchase cap (50% of available tickets).
         </p>
@@ -57,7 +58,7 @@ export default function Terms() {
       <section className="glass rounded-2xl p-6 space-y-3">
         <h2 className="text-2xl font-semibold">6. Contact</h2>
         <p className="text-white/70 text-sm">
-          Northedge Group Ltd, 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ.<br />
+          Northedge Group Ltd Compliance Team<br />
           Email: <a href="mailto:compliance@northedgegroup.co.uk" className="text-blue-light underline">compliance@northedgegroup.co.uk</a>
         </p>
       </section>

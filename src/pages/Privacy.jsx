@@ -48,7 +48,7 @@ export default function Privacy() {
         <h2 className="text-2xl font-semibold">5. Contact</h2>
         <p className="text-white/70 text-sm">
           Data Protection Officer<br />
-          Northedge Group Ltd, 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ<br />
+          Northedge Group Ltd Data Protection Team<br />
           Email: <a href="mailto:privacy@northedgegroup.co.uk" className="text-blue-light underline">privacy@northedgegroup.co.uk</a>
         </p>
       </section>

@@ -102,9 +102,9 @@ export default function RaffleDetails() {
       <div className="glass rounded-2xl p-6 space-y-4">
         <div className="p-4 rounded-2xl border border-white/10 bg-black/30 text-sm text-white/80">
           <h2 className="text-lg font-semibold text-white">Free Entry Route</h2>
-          <p className="mt-2">To enter this raffle without purchasing tickets, send a first-class postal entry to: <b>Royale Raffles Free Entry, Northedge Group Ltd, 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ</b>. Include your full name, email address, contact number, the raffle name, and confirmation that you are aged 18 or over. Postal entries must arrive before the published closing date.</p>
+          <p className="mt-2">To enter this raffle without purchasing tickets, send a first-class postal entry to the Royale Raffles free entry team. The full postal address will be confirmed before launch and can be requested by emailing <a href="mailto:support@northedgegroup.co.uk" className="text-blue-light underline">support@northedgegroup.co.uk</a>. Include your full name, email address, contact number, the raffle name, and confirmation that you are aged 18 or over. Postal entries must arrive before the published closing date.</p>
         </div>
-        <div className="text-xs text-white/60">Royale Raffles competitions are open to UK residents aged 18+. Winners are chosen at random using an independently verified draw system, and full results are published in the Winners Hub.</div>
+        <div className="text-xs text-white/60">Royale Raffles competitions are open to UK residents aged 18+. Winners are chosen at random using the RANDOM.ORG verified draw service, and full results are published in the Winners Hub.</div>
         <h2 className="text-xl font-semibold">{t('raffleDetails.participants')}</h2>
         <p className="text-white/70 text-sm">{t('raffleDetails.recentEntries')}</p>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
